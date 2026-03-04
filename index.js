@@ -36,7 +36,7 @@ const ADMIN_ROLE_ID = process.env.ADMIN_ROLE_ID || "123456789012345678";
 const OWNER_IDS = process.env.OWNER_USER_IDS
   ? process.env.OWNER_USER_IDS.split(",").map(id => id.trim()).filter(Boolean)
   : [
-      "OWNER_ID_1",  // <-- Thay bằng ID Discord thật của bạn
+      "1444578804189102221",  // <-- Thay bằng ID Discord thật của bạn
       "OWNER_ID_2",  // <-- Thêm người thứ 2 nếu muốn
     ];
 
