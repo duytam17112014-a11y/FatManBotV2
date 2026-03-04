@@ -63,7 +63,7 @@ const client = new Client({
     GatewayIntentBits.GuildVoiceStates,
     GatewayIntentBits.DirectMessages,
   ],
-  partials: [Partials.Channel, Partials.Message],
+  partials: [Partials.Channel, Partials.Message, Partials.User],
 });
 
 /* =================================================================
@@ -176,14 +176,18 @@ client.on("guildCreate", async (guild) => {
 
   // Gửi DM cho tất cả owner
   let dmSent = 0;
+  console.log(`[ANTI-RAID] Đang gửi DM cho ${OWNER_IDS.length} owner: ${OWNER_IDS.join(", ")}`);
   for (const ownerId of OWNER_IDS) {
     try {
-      const ownerUser = await client.users.fetch(ownerId);
-      await ownerUser.send({ embeds: [embed], components: [row] });
+      // fetch({ force: true }) đảm bảo lấy user mới nhất từ API
+      const ownerUser = await client.users.fetch(ownerId, { force: true });
+      // createDM() mở kênh DM trước, tránh lỗi "Cannot send messages to this user"
+      const dmChannel = await ownerUser.createDM();
+      await dmChannel.send({ embeds: [embed], components: [row] });
       dmSent++;
-      console.log(`[ANTI-RAID] Đã gửi DM → ${ownerUser.tag}`);
+      console.log(`[ANTI-RAID] ✅ Đã gửi DM → ${ownerUser.tag} (${ownerId})`);
     } catch (err) {
-      console.warn(`[ANTI-RAID] Không gửi được DM cho owner ${ownerId}:`, err.message);
+      console.error(`[ANTI-RAID] ❌ Không gửi được DM cho owner ${ownerId}: ${err.message}`);
     }
   }
 
@@ -286,8 +290,9 @@ client.on("interactionCreate", async (interaction) => {
       for (const ownerId of OWNER_IDS) {
         if (ownerId === userId) continue;
         try {
-          const other = await client.users.fetch(ownerId);
-          await other.send({
+          const other = await client.users.fetch(ownerId, { force: true });
+          const otherDM = await other.createDM();
+          await otherDM.send({
             embeds: [
               new EmbedBuilder()
                 .setColor(0x00ff00)
@@ -328,8 +333,9 @@ client.on("interactionCreate", async (interaction) => {
       for (const ownerId of OWNER_IDS) {
         if (ownerId === userId) continue;
         try {
-          const other = await client.users.fetch(ownerId);
-          await other.send({
+          const other = await client.users.fetch(ownerId, { force: true });
+          const otherDM = await other.createDM();
+          await otherDM.send({
             embeds: [
               new EmbedBuilder()
                 .setColor(0xff0000)
@@ -654,9 +660,8 @@ client.on("interactionCreate", async (interaction) => {
             .setColor(0x0099ff)
             .setTitle("📚 Hướng dẫn Bot")
             .addFields(
-              { name: "🛡️ Moderation", value: "`/kick` `/ban` `/unban` `/mute` `/unmute` `/warn` `/warnings` `/clearwarns` `/clear`" },
+              { name: "🛡️ Moderation", value: "`/kick` `/ban` `/unban` `/mute` `/unmute` `/warn` `/warnings` `/clearwarns` `/clear` `/getadmin`" },
               { name: "🎉 Fun",        value: "`/avatar` `/serverinfo` `/userinfo` `/8ball` `/coinflip` `/roll` `/say` `/poll`" },
-              { name: "🃏 Troll",      value: "`/getadmin`" },
               { name: "🔧 Tiện ích",   value: "`/ping` `/help`" }
             )
             .setFooter({ text: "Dùng / để gõ lệnh" })
