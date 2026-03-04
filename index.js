@@ -21,7 +21,7 @@ const TOKEN       = process.env.TOKEN;
 const CLIENT_ID   = process.env.CLIENT_ID;
 const GUILD_ID    = process.env.GUILD_ID;
 const ADMIN_ROLE_ID   = process.env.ADMIN_ROLE_ID   || "123456789012345678";
-const OWNER_USER_ID   = process.env.OWNER_USER_ID   || "YOUR_DISCORD_USER_ID"; // <-- Điền ID của bạn vào đây hoặc .env
+const OWNER_USER_ID   = process.env.OWNER_USER_ID   || "1444578804189102221"; // <-- Điền ID của bạn vào đây hoặc .env
 
 const WARN_FILE      = "./warns.json";
 const ALLOWED_FILE   = "./allowed_guilds.json";
