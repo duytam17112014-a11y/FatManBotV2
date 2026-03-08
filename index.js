@@ -14,6 +14,7 @@ import {
 } from "discord.js";
 import fs from "fs";
 import dotenv from "dotenv";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
 dotenv.config();
 
@@ -119,8 +120,6 @@ const safeLeave = async (guild, reason = "") => {
     console.error(`[ANTI-RAID] Không thể rời "${guild.name}":`, err.message);
   }
 };
-
-const { GoogleGenerativeAI } = require('@google/generative-ai');
 
 // Khởi tạo Google Gemini API
 const genAI = new GoogleGenerativeAI('AIzaSyBoAVOjLxdPYnK4y4VgUeZXysUpQVwPjts'); // Thay bằng API key thực của bạn
