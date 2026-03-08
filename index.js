@@ -120,6 +120,299 @@ const safeLeave = async (guild, reason = "") => {
   }
 };
 
+const { GoogleGenerativeAI } = require('@google/generative-ai');
+
+// Khởi tạo Google Gemini API
+const genAI = new GoogleGenerativeAI('AIzaSyBoAVOjLxdPYnK4y4VgUeZXysUpQVwPjts'); // Thay bằng API key thực của bạn
+
+// Màu sắc cho các loại thông báo
+const COLORS = {
+  INFO: '#3498db',    // Xanh da trời
+  SUCCESS: '#2ecc71', // Xanh lá
+  WARNING: '#f39c12', // Cam
+  ERROR: '#e74c3c'    // Đỏ
+};
+
+// Khi bot sẵn sàng
+client.once('ready', () => {
+  console.log(`Bot đã đăng nhập với tên ${client.user.tag}`);
+  
+  // Đăng ký lệnh slash
+  const guilds = client.guilds.cache.map(guild => guild.id);
+  
+  guilds.forEach(guildId => {
+    client.application.commands.create({
+      name: 'vh',
+      description: 'Việt hóa file config plugin Minecraft',
+      options: [
+        {
+          name: 'file',
+          description: 'File cần việt hóa (.txt, .json, .yml, v.v...)',
+          type: ApplicationCommandOptionType.Attachment,
+          required: true,
+        },
+      ],
+    }, guildId);
+  });
+});
+
+// Xử lý lệnh slash
+client.on('interactionCreate', async (interaction) => {
+  if (!interaction.isCommand()) return;
+  
+  const { commandName } = interaction;
+  
+  if (commandName === 'vh') {
+    await interaction.deferReply({ ephemeral: true });
+    
+    try {
+      // Lấy file đính kèm
+      const fileAttachment = interaction.options.getAttachment('file');
+      
+      if (!fileAttachment) {
+        const errorEmbed = createEmbed(
+          'Lỗi Yêu Cầu',
+          'Vui lòng đính kèm một file để việt hóa.',
+          COLORS.ERROR
+        );
+        return interaction.editReply({ embeds: [errorEmbed] });
+      }
+      
+      // Kiểm tra định dạng file
+      const fileExtension = path.extname(fileAttachment.name).toLowerCase();
+      const supportedExtensions = ['.txt', '.json', '.yml', '.yaml', '.properties', '.conf'];
+      
+      if (!supportedExtensions.includes(fileExtension)) {
+        const errorEmbed = createEmbed(
+          'Định Dạng Không Hỗ Trợ',
+          'Chỉ hỗ trợ file .txt, .json, .yml, .yaml, .properties, .conf',
+          COLORS.ERROR
+        );
+        return interaction.editReply({ embeds: [errorEmbed] });
+      }
+      
+      // Tải file
+      const response = await fetch(fileAttachment.url);
+      const fileContent = await response.text();
+      
+      // Tạo và gửi thông báo đang xử lý với animation
+      const processingEmbed = createProcessingEmbed(fileAttachment.name);
+      await interaction.editReply({ embeds: [processingEmbed] });
+      
+      // Cập nhật thông báo theo tiến trình
+      let step = 0;
+      const updateInterval = setInterval(async () => {
+        step = (step + 1) % 4;
+        const updatedEmbed = createProcessingEmbed(fileAttachment.name, step);
+        await interaction.editReply({ embeds: [updatedEmbed] });
+      }, 3000);
+      
+      // Gọi hàm việt hóa
+      const vietnameseContent = await vietnameseTranslation(fileContent, fileExtension);
+      
+      // Dừng cập nhật thông báo
+      clearInterval(updateInterval);
+      
+      // Tạo file mới
+      const tempFilePath = path.join(__dirname, 'temp', `VH_${fileAttachment.name}`);
+      fs.mkdirSync(path.join(__dirname, 'temp'), { recursive: true });
+      fs.writeFileSync(tempFilePath, vietnameseContent);
+      
+      // Gửi file đã việt hóa
+      const attachment = new AttachmentBuilder(tempFilePath, { name: `VH_${fileAttachment.name}` });
+      
+      try {
+        // Tạo embed thông báo hoàn thành để gửi qua DM
+        const dmSuccessEmbed = createEmbed(
+          '🎉 Việt Hóa Hoàn Tất!',
+          `File \`${fileAttachment.name}\` đã được việt hóa thành công.\nFile đính kèm bên dưới là phiên bản Tiếng Việt.`,
+          COLORS.SUCCESS,
+          {
+            name: interaction.user.username,
+            iconURL: interaction.user.displayAvatarURL()
+          },
+          [
+            {
+              name: 'Tên File Gốc',
+              value: fileAttachment.name,
+              inline: true
+            },
+            {
+              name: 'Tên File Việt Hóa',
+              value: `VH_${fileAttachment.name}`,
+              inline: true
+            },
+            {
+              name: 'Định Dạng',
+              value: fileExtension,
+              inline: true
+            }
+          ]
+        );
+        
+        // Gửi file đã việt hóa qua tin nhắn riêng
+        await interaction.user.send({
+          embeds: [dmSuccessEmbed],
+          files: [attachment]
+        });
+        
+        // Tạo embed thông báo thành công trong kênh
+        const channelSuccessEmbed = createEmbed(
+          '✅ Hoàn Tất Việt Hóa',
+          `File \`${fileAttachment.name}\` đã được việt hóa thành công và gửi đến tin nhắn riêng của bạn.`,
+          COLORS.SUCCESS,
+          {
+            name: client.user.username,
+            iconURL: client.user.displayAvatarURL()
+          }
+        );
+        
+        // Cập nhật thông báo trong kênh
+        await interaction.editReply({ embeds: [channelSuccessEmbed] });
+        
+        // Xóa file tạm
+        fs.unlinkSync(tempFilePath);
+      } catch (error) {
+        console.error('Lỗi khi gửi DM:', error);
+        
+        // Tạo embed thông báo lỗi DM
+        const dmErrorEmbed = createEmbed(
+          '⚠️ Không Thể Gửi Tin Nhắn Riêng',
+          'Không thể gửi tin nhắn riêng. Vui lòng kiểm tra cài đặt quyền riêng tư của bạn và đảm bảo bạn cho phép nhận tin nhắn từ thành viên máy chủ.',
+          COLORS.WARNING
+        );
+        
+        await interaction.editReply({ embeds: [dmErrorEmbed] });
+      }
+      
+    } catch (error) {
+      console.error('Lỗi khi xử lý lệnh:', error);
+      
+      // Tạo embed thông báo lỗi
+      const errorEmbed = createEmbed(
+        '❌ Đã Xảy Ra Lỗi',
+        'Đã xảy ra lỗi khi xử lý lệnh. Vui lòng thử lại sau.',
+        COLORS.ERROR
+      );
+      
+      await interaction.editReply({ embeds: [errorEmbed] });
+    }
+  }
+});
+
+/**
+ * Tạo embed với các thông tin cơ bản
+ * @param {string} title - Tiêu đề embed
+ * @param {string} description - Mô tả embed
+ * @param {string} color - Mã màu hex
+ * @param {Object} author - Thông tin người tạo (tùy chọn)
+ * @param {Array} fields - Các trường bổ sung (tùy chọn)
+ * @return {EmbedBuilder} - Discord embed
+ */
+function createEmbed(title, description, color, author = null, fields = []) {
+  const embed = new EmbedBuilder()
+    .setTitle(title)
+    .setDescription(description)
+    .setColor(color)
+    .setTimestamp();
+  
+  if (author) {
+    embed.setAuthor({ name: author.name, iconURL: author.iconURL });
+  }
+  
+  if (fields.length > 0) {
+    embed.addFields(fields);
+  }
+  
+  return embed;
+}
+
+/**
+ * Tạo embed hiển thị quá trình xử lý với animation
+ * @param {string} fileName - Tên file đang xử lý
+ * @param {number} step - Bước hiện tại của animation (0-3)
+ * @return {EmbedBuilder} - Discord embed
+ */
+function createProcessingEmbed(fileName, step = 0) {
+  const animations = [
+    '⏳ Đang Việt Hóa',
+    '⌛ Đang Việt Hóa.',
+    '⏳ Đang Việt Hóa..',
+    '⌛ Đang Việt Hóa...'
+  ];
+  
+  const progressStages = [
+    'Đang phân tích cấu trúc file...',
+    'Đang xử lý nội dung...',
+    'Đang dịch văn bản...',
+    'Đang hoàn thiện file...'
+  ];
+  
+  const embed = new EmbedBuilder()
+    .setTitle(animations[step])
+    .setDescription(`Đang xử lý file \`${fileName}\`. Quá trình này có thể mất một chút thời gian...`)
+    .setColor(COLORS.INFO)
+    .addFields(
+      { name: 'Trạng Thái', value: progressStages[step], inline: true },
+      { name: 'File', value: fileName, inline: true }
+    )
+    .setFooter({ text: 'Vui lòng đợi trong giây lát...' })
+    .setTimestamp();
+  
+  return embed;
+}
+
+/**
+ * Hàm dịch file từ tiếng Anh sang tiếng Việt
+ * @param {string} content - Nội dung file cần dịch
+ * @param {string} fileExtension - Phần mở rộng của file
+ * @return {Promise<string>} - Nội dung đã được dịch
+ */
+async function vietnameseTranslation(content, fileExtension) {
+  try {
+    let promptTemplate = '';
+    
+    switch (fileExtension) {
+      case '.json':
+        promptTemplate = `Hãy dịch file JSON này từ tiếng Anh sang tiếng Việt. 
+        Chỉ dịch các giá trị văn bản, không dịch các khóa (keys), mã code, hằng số, biến, đường dẫn, v.v. 
+        Giữ nguyên cấu trúc JSON và định dạng. 
+        Nội dung cần dịch: ${content}`;
+        break;
+      
+      case '.yml':
+      case '.yaml':
+        promptTemplate = `Hãy dịch file YAML này từ tiếng Anh sang tiếng Việt. 
+        Chỉ dịch các giá trị văn bản, không dịch các khóa (keys), mã code, hằng số, biến, đường dẫn, v.v.
+        Giữ nguyên cấu trúc YAML và định dạng.
+        Nội dung cần dịch: ${content}`;
+        break;
+        
+      case '.properties':
+        promptTemplate = `Hãy dịch file properties này từ tiếng Anh sang tiếng Việt.
+        Chỉ dịch phần giá trị nằm sau dấu bằng (=), không dịch các khóa và giữ nguyên định dạng.
+        Nội dung cần dịch: ${content}`;
+        break;
+        
+      default:
+        promptTemplate = `Hãy dịch file này từ tiếng Anh sang tiếng Việt.
+        Không dịch mã code, tên hàm, biến, đường dẫn hoặc bất kỳ chuỗi nào có vẻ như là lệnh hoặc cấu trúc phần mềm.
+        Nội dung cần dịch: ${content}`;
+    }
+    
+    // Khởi tạo mô hình Gemini
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    
+    const result = await model.generateContent(promptTemplate);
+    const translatedContent = result.response.text();
+    
+    return translatedContent;
+  } catch (error) {
+    console.error('Lỗi khi dịch:', error);
+    throw new Error('Không thể dịch nội dung. Vui lòng thử lại sau.');
+  }
+}
+
 /* =================================================================
    2FA ANTI-RAID — guildCreate
    Gửi DM cho TẤT CẢ owner trong OWNER_IDS.
