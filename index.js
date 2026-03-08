@@ -122,7 +122,7 @@ const safeLeave = async (guild, reason = "") => {
 };
 
 // Khởi tạo Google Gemini API
-const genAI = new GoogleGenerativeAI('AIzaSyBoAVOjLxdPYnK4y4VgUeZXysUpQVwPjts'); // Thay bằng API key thực của bạn
+const genAI = new GoogleGenerativeAI('AIzaSyAPTGKM8Gde0_Rc9umWUzzyhV_MGEZqOBI'); // Thay bằng API key thực của bạn
 
 // Màu sắc cho các loại thông báo
 const COLORS = {
