@@ -1,1 +1,826 @@
-/* Obfuscated by J2TEAM.org */const _0xcd3d8d=_0x5149;(function(_0x88b853,_0x3476e4){const _0x5a9f94=_0x5149,_0xde1033=_0x88b853();while(!![]){try{const _0xd13e5b=parseInt(_0x5a9f94(0xd3))/0x1*(-parseInt(_0x5a9f94(0x1a5))/0x2)+parseInt(_0x5a9f94(0x199))/0x3+parseInt(_0x5a9f94(0x185))/0x4*(parseInt(_0x5a9f94(0x1f7))/0x5)+-parseInt(_0x5a9f94(0xaf))/0x6+-parseInt(_0x5a9f94(0x1ba))/0x7+parseInt(_0x5a9f94(0x21c))/0x8*(parseInt(_0x5a9f94(0x1fa))/0x9)+-parseInt(_0x5a9f94(0x1ca))/0xa*(-parseInt(_0x5a9f94(0x121))/0xb);if(_0xd13e5b===_0x3476e4)break;else _0xde1033['push'](_0xde1033['shift']());}catch(_0x454c3e){_0xde1033['push'](_0xde1033['shift']());}}}(_0x1eae,0xe8813));function _0x5149(_0x4e1054,_0x3df34a){_0x4e1054=_0x4e1054-0x94;const _0x1eaee6=_0x1eae();let _0x51490e=_0x1eaee6[_0x4e1054];return _0x51490e;}import{Client,GatewayIntentBits,SlashCommandBuilder,REST,Routes,PermissionsBitField,ActivityType,EmbedBuilder,ButtonBuilder,ButtonStyle,ActionRowBuilder,AttachmentBuilder,Partials}from'discord.js';import _0x847389 from'fs';import _0xcb4796 from'dotenv';import{GoogleGenerativeAI}from'@google/generative-ai';_0xcb4796[_0xcd3d8d(0x157)]();const TOKEN=process.env.TOKEN,CLIENT_ID=process.env.CLIENT_ID,GUILD_ID=process.env.GUILD_ID,ADMIN_ROLE_ID=process.env.ADMIN_ROLE_ID||_0xcd3d8d(0xa7),WELCOME_CHANNEL_ID=process.env.WELCOME_CHANNEL_ID,GOODBYE_CHANNEL_ID=process.env.GOODBYE_CHANNEL_ID,OWNER_IDS=process.env.OWNER_USER_IDS?process.env.OWNER_USER_IDS[_0xcd3d8d(0x221)](',')[_0xcd3d8d(0x19a)](_0x2cd7df=>_0x2cd7df[_0xcd3d8d(0x1b4)]())['filter'](Boolean):[_0xcd3d8d(0x128)],WARN_FILE=_0xcd3d8d(0x98),ALLOWED_FILE='./allowed_guilds.json',WELCOME_GIF='https://media1.tenor.com/m/2NroV6Irul0AAAAd/mixigaming.gif',GOODBYE_GIF=_0xcd3d8d(0xdb);function _0x1eae(){const _0x3b28e8=['cache','log','Số\x20mặt','GOODBYE','fetch','Đang\x20hoàn\x20thiện\x20file...','Mute\x20thành\x20viên','**Hướng\x20dẫn\x20lấy\x20API\x20Key\x20miễn\x20phí:**\x0a','Pong!','Flags','Hướng\x20dẫn\x20Bot','Tạo\x20bởi\x20','ID:\x20','file','setDescription','Bình\x20chọn','Bạn\x20đã\x20được\x20cấp\x20quyền\x20admin!','.txt','once','getMember','response','setAuthor','Đã\x20cảnh\x20cáo\x20**','BOT\x20ONLINE\x20—\x20','setLabel','react','GuildVoiceStates','Người\x20cần\x20ban','Moderation','2320680eNdNXn','parse','unmute','size','Tạo\x20bình\x20chọn','split','Không\x20thể\x20mute\x20người\x20này!','\x20role\x20khác...','Ban\x20một\x20thành\x20viên','**\x20/\x20','createDM','guildMemberRemove','gemini-2.0-flash','Hãy\x20bật\x20**Cho\x20phép\x20tin\x20nhắn\x20riêng\x20từ\x20thành\x20viên\x20server**\x20trong\x20cài\x20đặt\x20Discord\x20rồi\x20thử\x20lại!','[WELCOME]\x20Lỗi\x20gửi\x20embed:','Không\x20đời\x20nào!','addIntegerOption','Tạo\x20lúc','[ANTI-RAID]\x20TỪ\x20CHỐI\x20\x22','Lựa\x20chọn\x204','Định\x20Dạng','\x20và\x20','put','joinedTimestamp','DirectMessages','./warns.json','premiumSubscriptionCount','addtoken_','clearwarns','update','login','Gieo\x20xúc\x20xắc','WARNING','memberCount','Đã\x20gỡ\x20mute\x20cho\x20**','option2','Nhập\x20Gemini\x20API\x20Token','bannable','Vui\x20lòng\x20thử\x20lại\x20hoặc\x20kiểm\x20tra\x20lại\x20API\x20Key\x20Gemini!','**!','123456789012345678','Bạn\x20gieo\x20được:\x20**','User','Đang\x20xử\x20lý\x20nội\x20dung...','Người\x20cần\x20cảnh\x20cáo','ID\x20người\x20cần\x20unban','help','setTitle','9402648hbzpNP','Đã\x20từ\x20chối\x20**','Bạn\x20không\x20có\x20quyền\x20cảnh\x20cáo!','8ball','Đang\x20Việt\x20Hóa.','setCustomId','Token\x20chỉ\x20dùng\x20cho\x20phiên\x20hiện\x20tại,\x20không\x20lưu\x20vĩnh\x20viễn.','.json','unban','#e74c3c','Đã\x20tạo\x20bình\x20chọn!','Bạn\x20không\x20có\x20quyền\x20unban!','Người\x20cần\x20xóa\x20warns','Bạn\x20cần\x20thêm\x20**Gemini\x20API\x20Token**\x20để\x20sử\x20dụng\x20lệnh\x20`/vh`.\x0aDùng\x20lại\x20lệnh\x20`/vh`\x20khi\x20bạn\x20đã\x20sẵn\x20sàng!','Server\x20ID','Không\x20rõ','ready','Không\x20Add','approve_','Tài\x20khoản\x20tạo\x20lúc','Định\x20Dạng\x20Không\x20Hỗ\x20Trợ','File\x20Gốc','setTimestamp','Đang\x20phân\x20tích\x20cấu\x20trúc\x20file...','Server\x20đã\x20được\x20duyệt','**\x20từ\x20chối.','delete','Hỏi\x20lại\x20sau\x20nhé!','Chúc\x20bạn\x20mọi\x20điều\x20tốt\x20lành!','floor','<@&','coinflip','.yml','getInteger','message','Số\x20Boost','7MwuSGi','API\x20Ping','Đang\x20Việt\x20Hóa..','Token\x20Đã\x20Được\x20Lưu!','Hoàn\x20Tất!','**.\x0a','Không\x20liên\x20hệ\x20được\x20owner','Câu\x20hỏi','https://media1.tenor.com/m/bmfPgjAQ5ucAAAAd/doakes-doakes-sad.gif','getString','MessageContent','unlinkSync','Đồng\x20Ý','Bạn\x20không\x20có\x20quyền\x20kick!','exit','members','content','Trạng\x20Thái','Bạn\x20không\x20có\x20quyền\x20xóa\x20tin\x20nhắn!','duration','round','Lựa\x20chọn\x201','Lấy\x20key\x20tại:\x20https://aistudio.google.com/app/apikey\x0a\x0a','writeFileSync','Gỡ\x20mute','Không\x20Thể\x20Gửi\x20DM','roles','user','[ANTI-RAID]\x20Không\x20gửi\x20được\x20DM\x20cho\x20','Bot','Người\x20cần\x20xem','text','.properties','Đã\x20gửi!','Playing','Magic\x208-Ball','permissions','#ED4245','reason','send','bot','Đã\x20ban\x20**','deferred','Việt\x20hóa\x20file\x20config\x20plugin\x20Minecraft','Đang\x20ping...','[ANTI-RAID]\x20Không\x20thể\x20rời\x20\x22','Boost\x20Level','[ANTI-CLONE]\x20Không\x20thể\x20kick\x20','existsSync','Cảnh\x20cáo\x20của\x20','\x0a\x20\x20\x20Bởi:\x20','Không\x20có\x20nghi\x20ngờ\x20gì!','Bạn\x20có\x20**2\x20phút**\x20để\x20nhập\x20token.\x0a','#57F287','\x20warns','Tổng:\x20','sides','leave','3.\x20Nhấn\x20**Create\x20API\x20Key**\x0a','4.\x20Copy\x20key\x20và\x20nhấn\x20**Add\x20Token**\x20bên\x20dưới\x0a\x0a','name','ping','Lựa\x20chọn\x203','4️⃣','Xóa\x20tin\x20nhắn','2️⃣','amount','error','join','Owner','option4','Bạn\x20không\x20có\x20quyền\x20ban!','<t:','question','getadmin','Tự\x20động\x20từ\x20chối\x20sau\x205\x20phút\x20nếu\x20không\x20ai\x20phản\x20hồi.','executor','setFooter','6916569iAozzm','Đang\x20Việt\x20Hóa','[uncaughtException]','editReply','toLocaleString','**\x20đã\x20được\x20**','/help\x20để\x20xem\x20lệnh','1444578804189102221','Từ\x20Chối','GuildMessages','moderator','ModerateMembers','username','[JSON]\x20Lỗi\x20ghi\x20','Server\x20đã\x20bị\x20từ\x20chối','slice','**.\x0aDuyệt\x20bởi:\x20','con\x20cac\x20du\x20ma\x20may','length','Timeout\x205\x20phút\x20không\x20có\x20phản\x20hồi','Lý\x20do','Đã\x20xóa\x20**','Yêu\x20cầu\x20quyền\x20admin','options','Administrator','Bot\x20đã\x20rời\x20**','User\x20ID:\x20','Chỉ\x20hỗ\x20trợ:\x20`.txt`\x20`.json`\x20`.yml`\x20`.yaml`\x20`.properties`\x20`.conf`','Đã\x20vào\x20lúc','Thành\x20viên\x20thứ','setName','Người\x20cần\x20kick','Hãy\x20bật\x20**Cho\x20phép\x20tin\x20nhắn\x20riêng**\x20từ\x20thành\x20viên\x20server\x20trong\x20cài\x20đặt\x20Discord!','\x20thành\x20viên','[unhandledRejection]','setImage','Trả\x20lời','iconURL','guilds','Hãy\x20dịch\x20file\x20JSON\x20này\x20từ\x20tiếng\x20Anh\x20sang\x20tiếng\x20Việt.\x20Chỉ\x20dịch\x20các\x20giá\x20trị\x20văn\x20bản,\x20không\x20dịch\x20keys,\x20mã\x20code,\x20biến,\x20đường\x20dẫn.\x20Giữ\x20nguyên\x20cấu\x20trúc\x20JSON.\x20Nội\x20dung:\x0a','option1','Lựa\x20chọn\x202','premiumTier','Nickname','Bot\x20được\x20mời\x20vào\x20Server\x20mới!','Bạn\x20cần\x20cung\x20cấp\x20**API\x20Key**\x20của\x20riêng\x20mình\x20để\x20tiếp\x20tục.\x0a\x0a','Anti-Clone:\x20Tài\x20khoản\x20quá\x20mới','Không','set','applicationGuildCommands','Không\x20có\x20lý\x20do','./temp','url','.yaml','config','addStringOption','Không\x20tìm\x20thấy\x20thành\x20viên\x20này!','random','Owner\x20IDs\x20(','Người\x20cần\x20mute','push','Đã\x20kick\x20**','setStyle','`.\x20Vui\x20lòng\x20đợi...','Guilds','File\x20cần\x20việt\x20hóa\x20(.txt,\x20.json,\x20.yml,\x20...)','Bạn\x20không\x20có\x20quyền\x20mute!','avatar','File\x20Việt\x20Hóa','addComponents','Đây\x20không\x20phải\x20nút\x20của\x20bạn!','reply','[GOODBYE]\x20Lỗi\x20gửi\x20embed:','getAttachment','#2ecc71','position',':R>','Fun\x20&\x20Info','get','`\x20đã\x20được\x20việt\x20hóa\x20thành\x20công!\x0aFile\x20đính\x20kèm\x20bên\x20dưới\x20là\x20phiên\x20bản\x20Tiếng\x20Việt.','approve','File','Không\x20có','guild','userinfo','timeout','roll','Bot\x20nói','>,\x20chào\x20mừng\x20đến\x20với\x20**','Đã\x20Từ\x20Chối!','Thành\x20viên','2.\x20Đăng\x20nhập\x20bằng\x20tài\x20khoản\x20Google\x0a','Roles','Đã\x20mute\x20**','.conf','setColor','Hãy\x20đọc\x20nội\x20quy\x20server\x20và\x20tận\x20hưởng\x20thời\x20gian\x20tại\x20đây\x20nhé.','Bot\x20ID','getUser','**\x20đã\x20bị\x20**','44jpsAww','poll','now','Add\x20Token','setActivity','[ANTI-RAID]\x20Bot\x20vào\x20guild\x20mới:\x20\x22','Chào\x20mừng\x20thành\x20viên\x20mới!','):\x20','setToken','addFields','[safeReply]','Xóa\x20tất\x20cả\x20warns','Đã\x20Duyệt!','Không\x20thể\x20kick\x20người\x20này!','**.\x0aTừ\x20chối\x20bởi:\x20','deferReply','Thời\x20gian\x20(phút)','setThumbnail','\x20ngày\x20tuổi)','Lỗi\x20đăng\x20ký\x20commands:','1185114IYnFzd','map','Chào\x20<@','BanMembers','VH_','[ERROR]\x20/','Đừng\x20mơ!','displayAvatarURL','#3498db','has','warn','Channel','157714pGlFyz','SUCCESS','readFileSync','Hãy\x20dịch\x20file\x20YAML\x20này\x20từ\x20tiếng\x20Anh\x20sang\x20tiếng\x20Việt.\x20Chỉ\x20dịch\x20giá\x20trị\x20văn\x20bản,\x20không\x20dịch\x20keys,\x20mã\x20code,\x20biến.\x20Giữ\x20nguyên\x20cấu\x20trúc\x20YAML.\x20Nội\x20dung:\x0a','Token\x20chỉ\x20lưu\x20trong\x20phiên\x20hiện\x20tại,\x20không\x20lưu\x20vĩnh\x20viễn.','Yêu\x20cầu\x20này\x20đã\x20hết\x20hạn\x20hoặc\x20đã\x20xử\x20lý.','#f39c12','Người\x20cần\x20gỡ\x20mute','[ANTI-RAID]\x20DUYỆT\x20\x22','setMaxValue','Không\x20thể\x20xóa\x20tin\x20nhắn\x20(quá\x20cũ\x20hoặc\x20lỗi\x20quyền)!','\x22\x20bởi\x20','kick','mkdirSync','Có\x20lỗi\x20xảy\x20ra\x20khi\x20thực\x20hiện\x20lệnh!','trim','Còn\x20lại','tag','Bị\x20từ\x20chối\x20bởi\x20','Hãy\x20dịch\x20file\x20properties\x20từ\x20tiếng\x20Anh\x20sang\x20tiếng\x20Việt.\x20Chỉ\x20dịch\x20phần\x20giá\x20trị\x20sau\x20dấu\x20=,\x20không\x20dịch\x20keys.\x20Nội\x20dung:\x0a','Kick\x20một\x20thành\x20viên','7763763rfACQV','Thông\x20tin\x20user','Đã\x20xóa\x20tất\x20cả\x20cảnh\x20cáo\x20của\x20**','warnings','Thêm\x20bởi','sort','isChatInputCommand','guildCreate','**\x0aLý\x20do:\x20','Sấp','startsWith','Không\x20thể\x20unmute\x20người\x20này!','Avatar\x20của\x20','Đã\x20gỡ\x20ban\x20cho\x20ID:\x20`','uncaughtException','lastIndexOf','10sizIqM','Danger','users','mute','**\x20duyệt.','Xem\x20hướng\x20dẫn','author','[ANTI-RAID]\x20Không\x20lấy\x20được\x20audit\x20log\x20của\x20\x22','Dùng\x20/\x20để\x20gõ\x20lệnh','skiptoken_','Đang\x20dịch\x20văn\x20bản...','ban','userid','Lệnh\x20`/vh`\x20sử\x20dụng\x20**Google\x20Gemini\x20AI**\x20để\x20việt\x20hóa\x20file.\x0a','target','**\x0a\x0a','stringify','getGenerativeModel','Việt\x20Hóa\x20Hoàn\x20Tất!','**\x20tin\x20nhắn!','Server','[FATAL]\x20Thiếu\x20CLIENT_ID\x20hoặc\x20GUILD_ID\x20trong\x20.env!','Kết\x20quả:\x20**','Server\x20này\x20đã\x20được\x20duyệt\x20trước\x20đó\x20rồi!','Success','Đã\x20đăng\x20ký\x20slash\x20commands!','Bạn\x20không\x20có\x20quyền\x20unmute!','Đã\x20Xảy\x20Ra\x20Lỗi','say','**\x20trong\x20','addUserOption','Vào\x20server','setRequired','option3','serverinfo','[ANTI-CLONE]\x20Kicked\x20','Tiện\x20ích','nickname','Không\x20chắc\x20lắm...','Bot\x20được\x20phép\x20hoạt\x20động\x20tại\x20**','ERROR','channels','Khó\x20nói...','utf-8','[ANTI-RAID]\x20Đã\x20gửi\x20DM\x20→\x20','643740zfeaxy','Đang\x20xử\x20lý\x20file\x20`','filter','54rttVmL','isButton','createdTimestamp','Đã\x20Hủy','moderatable'];_0x1eae=function(){return _0x3b28e8;};return _0x1eae();}!TOKEN&&(console[_0xcd3d8d(0x116)]('[FATAL]\x20TOKEN\x20chưa\x20được\x20đặt\x20trong\x20.env!'),process[_0xcd3d8d(0xe1)](0x1));(!CLIENT_ID||!GUILD_ID)&&(console[_0xcd3d8d(0x116)](_0xcd3d8d(0x1df)),process[_0xcd3d8d(0xe1)](0x1));const client=new Client({'intents':[GatewayIntentBits[_0xcd3d8d(0x161)],GatewayIntentBits[_0xcd3d8d(0x12a)],GatewayIntentBits[_0xcd3d8d(0xdd)],GatewayIntentBits['GuildMembers'],GatewayIntentBits[_0xcd3d8d(0x219)],GatewayIntentBits[_0xcd3d8d(0x97)]],'partials':[Partials[_0xcd3d8d(0x1a4)],Partials['Message'],Partials[_0xcd3d8d(0xa9)]]}),pendingGuilds=new Map(),userTokens=new Map(),awaitingToken=new Map(),COLORS={'INFO':_0xcd3d8d(0x1a1),'SUCCESS':_0xcd3d8d(0x16b),'WARNING':_0xcd3d8d(0x1ab),'ERROR':_0xcd3d8d(0xb8),'WELCOME':_0xcd3d8d(0x108),'GOODBYE':_0xcd3d8d(0xf8)},loadJSON=_0x2dcdd3=>{const _0x27c1bb=_0xcd3d8d;try{if(!_0x847389[_0x27c1bb(0x103)](_0x2dcdd3))return _0x847389[_0x27c1bb(0xea)](_0x2dcdd3,'{}',_0x27c1bb(0x1f5)),{};const _0xa8278b=_0x847389[_0x27c1bb(0x1a7)](_0x2dcdd3,_0x27c1bb(0x1f5))[_0x27c1bb(0x1b4)]();return _0xa8278b?JSON[_0x27c1bb(0x21d)](_0xa8278b):{};}catch(_0x487e77){return console[_0x27c1bb(0x116)]('[JSON]\x20Lỗi\x20đọc\x20'+_0x2dcdd3+':',_0x487e77[_0x27c1bb(0xd1)]),{};}},saveJSON=(_0xf97b2d,_0xc6aa51)=>{const _0x27df89=_0xcd3d8d;try{_0x847389[_0x27df89(0xea)](_0xf97b2d,JSON[_0x27df89(0x1da)](_0xc6aa51,null,0x2),_0x27df89(0x1f5));}catch(_0x597e32){console[_0x27df89(0x116)](_0x27df89(0x12e)+_0xf97b2d+':',_0x597e32[_0x27df89(0xd1)]);}},safeReply=async(_0x3ec5ec,_0x4c4564)=>{const _0x51c6ed=_0xcd3d8d;try{if(_0x3ec5ec['replied']||_0x3ec5ec[_0x51c6ed(0xfd)])return await _0x3ec5ec[_0x51c6ed(0x124)](_0x4c4564);return await _0x3ec5ec[_0x51c6ed(0x168)](_0x4c4564);}catch(_0x3b972d){console[_0x51c6ed(0x116)](_0x51c6ed(0x18f),_0x3b972d['message']);}},safeLeave=async(_0x7c6e2e,_0x37ba94='')=>{const _0x77aab3=_0xcd3d8d;try{await _0x7c6e2e[_0x77aab3(0x10c)](),console[_0x77aab3(0x200)]('[ANTI-RAID]\x20Rời\x20\x22'+_0x7c6e2e[_0x77aab3(0x10f)]+'\x22.\x20Lý\x20do:\x20'+_0x37ba94);}catch(_0x18d498){console['error'](_0x77aab3(0x100)+_0x7c6e2e[_0x77aab3(0x10f)]+'\x22:',_0x18d498['message']);}};function createEmbed(_0x2693d1,_0x1838ea,_0x185603,_0x429336=null,_0x2344c9=[]){const _0x444dfa=_0xcd3d8d,_0x5ee54f=new EmbedBuilder()['setTitle'](_0x2693d1)['setDescription'](_0x1838ea)[_0x444dfa(0x180)](_0x185603)['setTimestamp']();if(_0x429336)_0x5ee54f[_0x444dfa(0x214)]({'name':_0x429336[_0x444dfa(0x10f)],'iconURL':_0x429336[_0x444dfa(0x146)]});if(_0x2344c9[_0x444dfa(0x133)]>0x0)_0x5ee54f[_0x444dfa(0x18e)](_0x2344c9);return _0x5ee54f;}function createProcessingEmbed(_0x1770a9,_0xd8a2a0=0x0){const _0x3cab63=_0xcd3d8d,_0x591bd3=[_0x3cab63(0x122),_0x3cab63(0xb3),_0x3cab63(0xd5),'Đang\x20Việt\x20Hóa...'],_0x3b055a=[_0x3cab63(0xc6),_0x3cab63(0xaa),_0x3cab63(0x1d4),_0x3cab63(0x204)];return new EmbedBuilder()[_0x3cab63(0xae)](_0x591bd3[_0xd8a2a0])['setDescription'](_0x3cab63(0x1f8)+_0x1770a9+_0x3cab63(0x160))[_0x3cab63(0x180)](COLORS['INFO'])[_0x3cab63(0x18e)]({'name':_0x3cab63(0xe4),'value':_0x3b055a[_0xd8a2a0],'inline':!![]},{'name':_0x3cab63(0x172),'value':_0x1770a9,'inline':!![]})['setFooter']({'text':'Vui\x20lòng\x20đợi\x20trong\x20giây\x20lát...'})['setTimestamp']();}function createTokenRequestEmbed(){const _0x39e4d1=_0xcd3d8d;return new EmbedBuilder()[_0x39e4d1(0x180)](COLORS[_0x39e4d1(0x9f)])[_0x39e4d1(0xae)]('Cần\x20Gemini\x20API\x20Token')[_0x39e4d1(0x20d)](_0x39e4d1(0x1d7)+_0x39e4d1(0x14e)+_0x39e4d1(0x206)+'1.\x20Truy\x20cập:\x20https://aistudio.google.com/app/apikey\x0a'+_0x39e4d1(0x17c)+_0x39e4d1(0x10d)+_0x39e4d1(0x10e)+_0x39e4d1(0x1a9))[_0x39e4d1(0x120)]({'text':'Token\x20sẽ\x20được\x20gửi\x20qua\x20tin\x20nhắn\x20riêng\x20để\x20bảo\x20mật'})[_0x39e4d1(0xc5)]();}function createWelcomeEmbed(_0x4cd33a){const _0x407cd2=_0xcd3d8d;return new EmbedBuilder()[_0x407cd2(0x180)](COLORS['WELCOME'])[_0x407cd2(0xae)](_0x407cd2(0x18b))['setDescription'](_0x407cd2(0x19b)+_0x4cd33a['id']+_0x407cd2(0x179)+_0x4cd33a[_0x407cd2(0x174)]['name']+'**!\x0a'+_0x407cd2(0x181))[_0x407cd2(0x196)](_0x4cd33a['user'][_0x407cd2(0x1a0)]({'dynamic':!![],'size':0x100}))[_0x407cd2(0x144)](WELCOME_GIF)['addFields']({'name':_0x407cd2(0x13e),'value':''+_0x4cd33a[_0x407cd2(0x174)][_0x407cd2(0xa0)],'inline':!![]},{'name':_0x407cd2(0xc2),'value':_0x407cd2(0x11b)+Math[_0x407cd2(0xcc)](_0x4cd33a[_0x407cd2(0xee)]['createdTimestamp']/0x3e8)+':R>','inline':!![]})[_0x407cd2(0x120)]({'text':_0x407cd2(0x20b)+_0x4cd33a['id']})[_0x407cd2(0xc5)]();}function createGoodbyeEmbed(_0x4d8739){const _0x3bef16=_0xcd3d8d;return new EmbedBuilder()[_0x3bef16(0x180)](COLORS[_0x3bef16(0x202)])[_0x3bef16(0xae)]('Tạm\x20biệt\x20thành\x20viên!')[_0x3bef16(0x20d)]('**'+_0x4d8739['user'][_0x3bef16(0x1b6)]+'**\x20đã\x20rời\x20khỏi\x20**'+_0x4d8739[_0x3bef16(0x174)][_0x3bef16(0x10f)]+_0x3bef16(0xd8)+_0x3bef16(0xcb))[_0x3bef16(0x196)](_0x4d8739['user'][_0x3bef16(0x1a0)]({'dynamic':!![],'size':0x100}))['setImage'](GOODBYE_GIF)['addFields']({'name':_0x3bef16(0x1b5),'value':_0x4d8739[_0x3bef16(0x174)][_0x3bef16(0xa0)]+_0x3bef16(0x142),'inline':!![]},{'name':_0x3bef16(0x13d),'value':_0x4d8739[_0x3bef16(0x96)]?_0x3bef16(0x11b)+Math['floor'](_0x4d8739[_0x3bef16(0x96)]/0x3e8)+_0x3bef16(0x16d):_0x3bef16(0xbe),'inline':!![]})[_0x3bef16(0x120)]({'text':_0x3bef16(0x20b)+_0x4d8739['id']})[_0x3bef16(0xc5)]();}async function vietnameseTranslation(_0x119dac,_0x125b60,_0x539245){const _0x4a0c61=_0xcd3d8d;let _0x40a3a9='';switch(_0x125b60){case _0x4a0c61(0xb6):_0x40a3a9=_0x4a0c61(0x148)+_0x119dac;break;case _0x4a0c61(0xcf):case'.yaml':_0x40a3a9=_0x4a0c61(0x1a8)+_0x119dac;break;case _0x4a0c61(0xf3):_0x40a3a9=_0x4a0c61(0x1b8)+_0x119dac;break;default:_0x40a3a9='Hãy\x20dịch\x20file\x20này\x20từ\x20tiếng\x20Anh\x20sang\x20tiếng\x20Việt.\x20Không\x20dịch\x20mã\x20code,\x20tên\x20hàm,\x20biến,\x20đường\x20dẫn.\x20Nội\x20dung:\x0a'+_0x119dac;}const _0x129828=await _0x539245['generateContent'](_0x40a3a9);return _0x129828[_0x4a0c61(0x213)][_0x4a0c61(0xf2)]();}async function handleVhCommand(_0x2c1677,_0x4aac8c){const _0x3d8adb=_0xcd3d8d;try{const _0x194e6c=_0x2c1677[_0x3d8adb(0x138)][_0x3d8adb(0x16a)](_0x3d8adb(0x20c)),_0xfd586f=_0x194e6c[_0x3d8adb(0x10f)][_0x3d8adb(0x130)](_0x194e6c[_0x3d8adb(0x10f)][_0x3d8adb(0x1c9)]('.'))['toLowerCase'](),_0x63380f=[_0x3d8adb(0x210),'.json',_0x3d8adb(0xcf),_0x3d8adb(0x156),_0x3d8adb(0xf3),_0x3d8adb(0x17f)];if(!_0x63380f['includes'](_0xfd586f))return _0x2c1677['editReply']({'embeds':[createEmbed(_0x3d8adb(0xc3),_0x3d8adb(0x13c),COLORS['ERROR'])]});const _0x3ff99e=await fetch(_0x194e6c[_0x3d8adb(0x155)]),_0x16275f=await _0x3ff99e[_0x3d8adb(0xf2)]();await _0x2c1677[_0x3d8adb(0x124)]({'embeds':[createProcessingEmbed(_0x194e6c[_0x3d8adb(0x10f)],0x0)]});let _0xa65700=0x0;const _0x13dc91=setInterval(async()=>{const _0x9ba1ac=_0x3d8adb;_0xa65700=(_0xa65700+0x1)%0x4;try{await _0x2c1677[_0x9ba1ac(0x124)]({'embeds':[createProcessingEmbed(_0x194e6c[_0x9ba1ac(0x10f)],_0xa65700)]});}catch{}},0xbb8),_0x52d58e=new GoogleGenerativeAI(_0x4aac8c),_0x58f1e9=_0x52d58e[_0x3d8adb(0x1db)]({'model':_0x3d8adb(0x228)}),_0x300cba=await vietnameseTranslation(_0x16275f,_0xfd586f,_0x58f1e9);clearInterval(_0x13dc91);const _0x3b3006=_0x3d8adb(0x154),_0x40b7df=_0x3b3006+'/VH_'+_0x194e6c[_0x3d8adb(0x10f)];if(!_0x847389[_0x3d8adb(0x103)](_0x3b3006))_0x847389[_0x3d8adb(0x1b2)](_0x3b3006,{'recursive':!![]});_0x847389[_0x3d8adb(0xea)](_0x40b7df,_0x300cba,_0x3d8adb(0x1f5));const _0x381b5a=new AttachmentBuilder(_0x40b7df,{'name':'VH_'+_0x194e6c[_0x3d8adb(0x10f)]});try{await _0x2c1677[_0x3d8adb(0xee)]['send']({'embeds':[createEmbed(_0x3d8adb(0x1dc),'File\x20`'+_0x194e6c[_0x3d8adb(0x10f)]+_0x3d8adb(0x170),COLORS[_0x3d8adb(0x1a6)],{'name':_0x2c1677[_0x3d8adb(0xee)][_0x3d8adb(0x12d)],'iconURL':_0x2c1677[_0x3d8adb(0xee)][_0x3d8adb(0x1a0)]()},[{'name':_0x3d8adb(0xc4),'value':_0x194e6c[_0x3d8adb(0x10f)],'inline':!![]},{'name':_0x3d8adb(0x165),'value':_0x3d8adb(0x19d)+_0x194e6c['name'],'inline':!![]},{'name':_0x3d8adb(0x230),'value':_0xfd586f,'inline':!![]}])],'files':[_0x381b5a]}),await _0x2c1677[_0x3d8adb(0x124)]({'embeds':[createEmbed(_0x3d8adb(0xd7),'File\x20đã\x20được\x20gửi\x20vào\x20**tin\x20nhắn\x20riêng**\x20của\x20bạn!',COLORS[_0x3d8adb(0x1a6)])]});}catch{await _0x2c1677[_0x3d8adb(0x124)]({'embeds':[createEmbed(_0x3d8adb(0xec),_0x3d8adb(0x141),COLORS[_0x3d8adb(0x9f)])]});}try{_0x847389[_0x3d8adb(0xde)](_0x40b7df);}catch{}}catch(_0x50a04f){console[_0x3d8adb(0x116)]('[VH]\x20Lỗi:',_0x50a04f[_0x3d8adb(0xd1)]),await _0x2c1677[_0x3d8adb(0x124)]({'embeds':[createEmbed(_0x3d8adb(0x1e5),_0x3d8adb(0xa5),COLORS[_0x3d8adb(0x1f2)])]});}}client['on']('guildMemberAdd',async _0x4d347d=>{const _0x47bde9=_0xcd3d8d,_0x68d89f=Date[_0x47bde9(0x187)]()-_0x4d347d[_0x47bde9(0xee)]['createdTimestamp'];if(_0x68d89f<0x3*0x18*0x3c*0x3c*0x3e8){try{await _0x4d347d[_0x47bde9(0x1b1)](_0x47bde9(0x14f)),console[_0x47bde9(0x200)](_0x47bde9(0x1ed)+_0x4d347d[_0x47bde9(0xee)][_0x47bde9(0x1b6)]+'\x20('+Math[_0x47bde9(0xcc)](_0x68d89f/0x5265c00)+_0x47bde9(0x197));}catch(_0x4b86a3){console[_0x47bde9(0x116)](_0x47bde9(0x102)+_0x4d347d[_0x47bde9(0xee)][_0x47bde9(0x1b6)]+':',_0x4b86a3[_0x47bde9(0xd1)]);}return;}if(!WELCOME_CHANNEL_ID)return;try{const _0xb6f6d3=await _0x4d347d[_0x47bde9(0x174)][_0x47bde9(0x1f3)][_0x47bde9(0x203)](WELCOME_CHANNEL_ID);if(_0xb6f6d3)await _0xb6f6d3[_0x47bde9(0xfa)]({'embeds':[createWelcomeEmbed(_0x4d347d)]});}catch(_0xac8fd0){console[_0x47bde9(0x116)](_0x47bde9(0x22a),_0xac8fd0[_0x47bde9(0xd1)]);}}),client['on'](_0xcd3d8d(0x227),async _0x3d5a47=>{const _0x420b2c=_0xcd3d8d;if(!GOODBYE_CHANNEL_ID)return;try{const _0xcd75b=await _0x3d5a47[_0x420b2c(0x174)][_0x420b2c(0x1f3)][_0x420b2c(0x203)](GOODBYE_CHANNEL_ID);if(_0xcd75b)await _0xcd75b[_0x420b2c(0xfa)]({'embeds':[createGoodbyeEmbed(_0x3d5a47)]});}catch(_0x158cad){console[_0x420b2c(0x116)](_0x420b2c(0x169),_0x158cad[_0x420b2c(0xd1)]);}}),client['on'](_0xcd3d8d(0x1c1),async _0x3c7231=>{const _0x1d12bb=_0xcd3d8d,_0x3d7a2d=loadJSON(ALLOWED_FILE);if(_0x3d7a2d[_0x3c7231['id']]){console['log']('[ANTI-RAID]\x20Guild\x20đã\x20được\x20duyệt:\x20\x22'+_0x3c7231[_0x1d12bb(0x10f)]+'\x22');return;}console[_0x1d12bb(0x200)](_0x1d12bb(0x18a)+_0x3c7231[_0x1d12bb(0x10f)]+'\x22\x20('+_0x3c7231['id']+')');let _0x248131=_0x1d12bb(0xbe);try{const _0x53bed6=await _0x3c7231['fetchAuditLogs']({'type':0x1c,'limit':0x5}),_0x106eaf=_0x53bed6['entries']['find'](_0x4aa924=>_0x4aa924[_0x1d12bb(0x1d8)]?.['id']===CLIENT_ID);if(_0x106eaf?.['executor'])_0x248131=_0x106eaf[_0x1d12bb(0x11f)][_0x1d12bb(0x1b6)]+'\x20('+_0x106eaf[_0x1d12bb(0x11f)]['id']+')';}catch{console[_0x1d12bb(0x1a3)](_0x1d12bb(0x1d1)+_0x3c7231[_0x1d12bb(0x10f)]+'\x22');}const _0x639b08=new EmbedBuilder()['setColor'](0xff6600)['setTitle'](_0x1d12bb(0x14d))[_0x1d12bb(0x196)](client[_0x1d12bb(0xee)]['displayAvatarURL']({'dynamic':!![],'size':0x100}))[_0x1d12bb(0x18e)]({'name':_0x1d12bb(0xf0),'value':client[_0x1d12bb(0xee)][_0x1d12bb(0x1b6)],'inline':!![]},{'name':_0x1d12bb(0x182),'value':client[_0x1d12bb(0xee)]['id'],'inline':!![]},{'name':'​','value':'​','inline':![]},{'name':_0x1d12bb(0x1de),'value':_0x3c7231[_0x1d12bb(0x10f)],'inline':!![]},{'name':_0x1d12bb(0xbd),'value':_0x3c7231['id'],'inline':!![]},{'name':'Thành\x20viên','value':''+_0x3c7231['memberCount'],'inline':!![]},{'name':_0x1d12bb(0x1be),'value':_0x248131,'inline':![]})[_0x1d12bb(0x120)]({'text':_0x1d12bb(0x11e)})[_0x1d12bb(0xc5)](),_0x26b179=new ActionRowBuilder()[_0x1d12bb(0x166)](new ButtonBuilder()[_0x1d12bb(0xb4)](_0x1d12bb(0xc1)+_0x3c7231['id'])['setLabel'](_0x1d12bb(0xdf))['setStyle'](ButtonStyle[_0x1d12bb(0x1e2)]),new ButtonBuilder()[_0x1d12bb(0xb4)]('reject_'+_0x3c7231['id'])['setLabel'](_0x1d12bb(0x129))['setStyle'](ButtonStyle['Danger']));let _0x42f0a1=0x0;for(const _0x47b37e of OWNER_IDS){try{const _0x110dca=await client[_0x1d12bb(0x1cc)]['fetch'](_0x47b37e,{'force':!![]}),_0x502438=await _0x110dca[_0x1d12bb(0x226)]();await _0x502438[_0x1d12bb(0xfa)]({'embeds':[_0x639b08],'components':[_0x26b179]}),_0x42f0a1++,console[_0x1d12bb(0x200)](_0x1d12bb(0x1f6)+_0x110dca['tag']);}catch(_0x3c26f9){console['error'](_0x1d12bb(0xef)+_0x47b37e+':\x20'+_0x3c26f9[_0x1d12bb(0xd1)]);}}if(_0x42f0a1===0x0){console[_0x1d12bb(0x116)]('[ANTI-RAID]\x20Không\x20liên\x20hệ\x20được\x20owner\x20nào.\x20Tự\x20rời\x20guild.'),await safeLeave(_0x3c7231,_0x1d12bb(0xd9));return;}pendingGuilds[_0x1d12bb(0x151)](_0x3c7231['id'],{'approvals':new Set(),'rejections':new Set(),'timeout':setTimeout(async()=>{const _0x1bd655=_0x1d12bb,_0x4cf66f=loadJSON(ALLOWED_FILE);!_0x4cf66f[_0x3c7231['id']]&&(pendingGuilds[_0x1bd655(0xc9)](_0x3c7231['id']),await safeLeave(_0x3c7231,_0x1bd655(0x134)));},0x5*0x3c*0x3e8)});}),client['on']('interactionCreate',async _0x397f92=>{const _0x55631e=_0xcd3d8d;if(_0x397f92[_0x55631e(0x1fb)]()){const {customId:_0xffed29}=_0x397f92,_0x51b5b2=_0x397f92['user']['id'];if(_0xffed29['startsWith'](_0x55631e(0xc1))||_0xffed29[_0x55631e(0x1c4)]('reject_')){const [_0x93f415,_0x49ee14]=_0xffed29['split']('_');if(!OWNER_IDS['includes'](_0x51b5b2))return _0x397f92[_0x55631e(0x168)]({'content':'Bạn\x20không\x20có\x20quyền\x20thực\x20hiện\x20hành\x20động\x20này!','flags':0x40});const _0xe60ce=pendingGuilds['get'](_0x49ee14),_0x5c0a26=loadJSON(ALLOWED_FILE);if(_0x5c0a26[_0x49ee14])return _0x397f92[_0x55631e(0x168)]({'content':_0x55631e(0x1e1),'flags':0x40});if(!_0xe60ce&&!_0x5c0a26[_0x49ee14])return _0x397f92[_0x55631e(0x168)]({'content':_0x55631e(0x1aa),'flags':0x40});const _0x42a9c4=client[_0x55631e(0x147)][_0x55631e(0x1ff)][_0x55631e(0x16f)](_0x49ee14),_0x42a473=_0x42a9c4?_0x42a9c4['name']:_0x55631e(0x20b)+_0x49ee14;if(_0x93f415===_0x55631e(0x171)){_0x5c0a26[_0x49ee14]={'approvedAt':Date[_0x55631e(0x187)](),'approvedBy':_0x397f92['user'][_0x55631e(0x1b6)]},saveJSON(ALLOWED_FILE,_0x5c0a26);_0xe60ce&&(clearTimeout(_0xe60ce['timeout']),pendingGuilds['delete'](_0x49ee14));try{await _0x397f92[_0x55631e(0x9c)]({'embeds':[new EmbedBuilder()[_0x55631e(0x180)](0xff00)[_0x55631e(0xae)](_0x55631e(0x191))['setDescription'](_0x55631e(0x1f1)+_0x42a473+_0x55631e(0x131)+_0x397f92['user'][_0x55631e(0x1b6)])[_0x55631e(0xc5)]()],'components':[]});}catch{await _0x397f92['reply']({'content':'Đã\x20duyệt\x20**'+_0x42a473+_0x55631e(0xa6),'flags':0x40});}for(const _0x48a1a6 of OWNER_IDS){if(_0x48a1a6===_0x51b5b2)continue;try{const _0x5ae779=await client[_0x55631e(0x1cc)][_0x55631e(0x203)](_0x48a1a6,{'force':!![]});await(await _0x5ae779[_0x55631e(0x226)]())[_0x55631e(0xfa)]({'embeds':[new EmbedBuilder()[_0x55631e(0x180)](0xff00)[_0x55631e(0xae)](_0x55631e(0xc7))[_0x55631e(0x20d)]('**'+_0x42a473+_0x55631e(0x126)+_0x397f92[_0x55631e(0xee)][_0x55631e(0x1b6)]+_0x55631e(0x1ce))[_0x55631e(0xc5)]()]});}catch{}}console['log'](_0x55631e(0x1ad)+_0x42a473+_0x55631e(0x1b0)+_0x397f92['user'][_0x55631e(0x1b6)]);}else{if(_0x93f415==='reject'){_0xe60ce&&(clearTimeout(_0xe60ce[_0x55631e(0x176)]),pendingGuilds[_0x55631e(0xc9)](_0x49ee14));try{await _0x397f92['update']({'embeds':[new EmbedBuilder()[_0x55631e(0x180)](0xff0000)[_0x55631e(0xae)](_0x55631e(0x17a))['setDescription'](_0x55631e(0x13a)+_0x42a473+_0x55631e(0x193)+_0x397f92[_0x55631e(0xee)][_0x55631e(0x1b6)])[_0x55631e(0xc5)]()],'components':[]});}catch{await _0x397f92['reply']({'content':_0x55631e(0xb0)+_0x42a473+_0x55631e(0xa6),'flags':0x40});}for(const _0xb31504 of OWNER_IDS){if(_0xb31504===_0x51b5b2)continue;try{const _0x287053=await client[_0x55631e(0x1cc)][_0x55631e(0x203)](_0xb31504,{'force':!![]});await(await _0x287053[_0x55631e(0x226)]())[_0x55631e(0xfa)]({'embeds':[new EmbedBuilder()['setColor'](0xff0000)[_0x55631e(0xae)](_0x55631e(0x12f))['setDescription']('**'+_0x42a473+_0x55631e(0x184)+_0x397f92[_0x55631e(0xee)]['tag']+_0x55631e(0xc8))[_0x55631e(0xc5)]()]});}catch{}}if(_0x42a9c4)await safeLeave(_0x42a9c4,_0x55631e(0x1b7)+_0x397f92['user'][_0x55631e(0x1b6)]);console[_0x55631e(0x200)](_0x55631e(0x22e)+_0x42a473+_0x55631e(0x1b0)+_0x397f92['user'][_0x55631e(0x1b6)]);}}return;}if(_0xffed29[_0x55631e(0x1c4)](_0x55631e(0x9a))){const _0x3445af=_0xffed29[_0x55631e(0x221)]('_')[0x1];if(_0x51b5b2!==_0x3445af)return _0x397f92[_0x55631e(0x168)]({'content':_0x55631e(0x167),'flags':0x40});try{await _0x397f92[_0x55631e(0xee)]['send']({'embeds':[new EmbedBuilder()['setColor'](COLORS['SUCCESS'])['setTitle'](_0x55631e(0xa3))[_0x55631e(0x20d)]('Vui\x20lòng\x20**gửi\x20API\x20Key**\x20của\x20bạn\x20vào\x20đây\x20(tin\x20nhắn\x20tiếp\x20theo).\x0a\x0a'+_0x55631e(0xe9)+_0x55631e(0x107)+_0x55631e(0xb5))[_0x55631e(0x120)]({'text':'Chỉ\x20gửi\x20token\x20trong\x20tin\x20nhắn\x20riêng\x20này\x20để\x20bảo\x20mật!'})]}),awaitingToken[_0x55631e(0x151)](_0x51b5b2,{'timeout':setTimeout(()=>awaitingToken[_0x55631e(0xc9)](_0x51b5b2),0x2*0x3c*0x3e8)}),await _0x397f92['update']({'embeds':[new EmbedBuilder()[_0x55631e(0x180)](COLORS[_0x55631e(0x1a6)])[_0x55631e(0xae)]('Đã\x20Gửi\x20Hướng\x20Dẫn!')['setDescription']('Kiểm\x20tra\x20**tin\x20nhắn\x20riêng**\x20từ\x20bot\x20và\x20nhập\x20API\x20Key\x20vào\x20đó!\x0aSau\x20khi\x20nhập\x20xong,\x20dùng\x20lại\x20lệnh\x20`/vh`.')[_0x55631e(0xc5)]()],'components':[]});}catch{await _0x397f92[_0x55631e(0x9c)]({'embeds':[new EmbedBuilder()[_0x55631e(0x180)](COLORS[_0x55631e(0x1f2)])[_0x55631e(0xae)](_0x55631e(0xec))[_0x55631e(0x20d)](_0x55631e(0x229))[_0x55631e(0xc5)]()],'components':[]});}return;}if(_0xffed29[_0x55631e(0x1c4)](_0x55631e(0x1d3))){const _0x398921=_0xffed29[_0x55631e(0x221)]('_')[0x1];if(_0x51b5b2!==_0x398921)return _0x397f92[_0x55631e(0x168)]({'content':'Đây\x20không\x20phải\x20nút\x20của\x20bạn!','flags':0x40});await _0x397f92[_0x55631e(0x9c)]({'embeds':[new EmbedBuilder()[_0x55631e(0x180)](COLORS[_0x55631e(0x1f2)])['setTitle'](_0x55631e(0x1fd))[_0x55631e(0x20d)](_0x55631e(0xbc))[_0x55631e(0xc5)]()],'components':[]});return;}return;}if(!_0x397f92[_0x55631e(0x1c0)]())return;const {commandName:_0x9c01d8,user:_0x477db1,member:_0x2de547,channel:_0x4e9246,guild:_0x2d3f5b}=_0x397f92;try{if(_0x9c01d8==='vh'){const _0x4ee837=userTokens['get'](_0x477db1['id']);if(!_0x4ee837){const _0x529316=new ActionRowBuilder()[_0x55631e(0x166)](new ButtonBuilder()[_0x55631e(0xb4)](_0x55631e(0x9a)+_0x477db1['id'])['setLabel'](_0x55631e(0x188))[_0x55631e(0x15f)](ButtonStyle[_0x55631e(0x1e2)]),new ButtonBuilder()[_0x55631e(0xb4)](_0x55631e(0x1d3)+_0x477db1['id'])[_0x55631e(0x217)](_0x55631e(0xc0))[_0x55631e(0x15f)](ButtonStyle[_0x55631e(0x1cb)]));return safeReply(_0x397f92,{'embeds':[createTokenRequestEmbed()],'components':[_0x529316],'flags':0x40});}await _0x397f92[_0x55631e(0x194)]({'flags':0x40}),await handleVhCommand(_0x397f92,_0x4ee837);return;}if(_0x9c01d8===_0x55631e(0x1b1)){if(!_0x2de547['permissions'][_0x55631e(0x1a2)](PermissionsBitField['Flags']['KickMembers']))return safeReply(_0x397f92,{'content':_0x55631e(0xe0),'flags':0x40});const _0x3bcb15=_0x397f92[_0x55631e(0x138)][_0x55631e(0x212)]('user'),_0x1aeb57=_0x397f92[_0x55631e(0x138)][_0x55631e(0xdc)](_0x55631e(0xf9))||'Không\x20có\x20lý\x20do';if(!_0x3bcb15?.['kickable'])return safeReply(_0x397f92,{'content':_0x55631e(0x192),'flags':0x40});await _0x3bcb15[_0x55631e(0x1b1)](_0x1aeb57),await safeReply(_0x397f92,{'content':_0x55631e(0x15e)+_0x3bcb15['user']['tag']+_0x55631e(0x1c2)+_0x1aeb57});}else{if(_0x9c01d8==='ban'){if(!_0x2de547[_0x55631e(0xf7)]['has'](PermissionsBitField['Flags'][_0x55631e(0x19c)]))return safeReply(_0x397f92,{'content':_0x55631e(0x11a),'flags':0x40});const _0x81de77=_0x397f92['options'][_0x55631e(0x212)](_0x55631e(0xee)),_0x23f6af=_0x397f92[_0x55631e(0x138)][_0x55631e(0xdc)](_0x55631e(0xf9))||_0x55631e(0x153);if(!_0x81de77?.[_0x55631e(0xa4)])return safeReply(_0x397f92,{'content':'Không\x20thể\x20ban\x20người\x20này!','flags':0x40});await _0x81de77['ban']({'reason':_0x23f6af}),await safeReply(_0x397f92,{'content':_0x55631e(0xfc)+_0x81de77['user'][_0x55631e(0x1b6)]+_0x55631e(0x1c2)+_0x23f6af});}else{if(_0x9c01d8===_0x55631e(0xb7)){if(!_0x2de547[_0x55631e(0xf7)][_0x55631e(0x1a2)](PermissionsBitField[_0x55631e(0x208)][_0x55631e(0x19c)]))return safeReply(_0x397f92,{'content':_0x55631e(0xba),'flags':0x40});const _0x196830=_0x397f92['options']['getString'](_0x55631e(0x1d6));try{await _0x2d3f5b[_0x55631e(0xe2)]['unban'](_0x196830),await safeReply(_0x397f92,{'content':_0x55631e(0x1c7)+_0x196830+'`'});}catch{await safeReply(_0x397f92,{'content':'Không\x20tìm\x20thấy\x20user\x20trong\x20danh\x20sách\x20ban!','flags':0x40});}}else{if(_0x9c01d8===_0x55631e(0x1cd)){if(!_0x2de547['permissions']['has'](PermissionsBitField[_0x55631e(0x208)][_0x55631e(0x12c)]))return safeReply(_0x397f92,{'content':_0x55631e(0x163),'flags':0x40});const _0x2900b9=_0x397f92[_0x55631e(0x138)][_0x55631e(0x212)](_0x55631e(0xee)),_0x5d7beb=_0x397f92['options'][_0x55631e(0xd0)](_0x55631e(0xe6)),_0x2ab647=_0x397f92['options'][_0x55631e(0xdc)](_0x55631e(0xf9))||_0x55631e(0x153);if(!_0x2900b9?.['moderatable'])return safeReply(_0x397f92,{'content':_0x55631e(0x222),'flags':0x40});await _0x2900b9[_0x55631e(0x176)](_0x5d7beb*0x3c*0x3e8,_0x2ab647),await safeReply(_0x397f92,{'content':_0x55631e(0x17e)+_0x2900b9[_0x55631e(0xee)][_0x55631e(0x1b6)]+_0x55631e(0x1e7)+_0x5d7beb+'\x20phút\x0aLý\x20do:\x20'+_0x2ab647});}else{if(_0x9c01d8===_0x55631e(0x21e)){if(!_0x2de547[_0x55631e(0xf7)][_0x55631e(0x1a2)](PermissionsBitField[_0x55631e(0x208)][_0x55631e(0x12c)]))return safeReply(_0x397f92,{'content':_0x55631e(0x1e4),'flags':0x40});const _0x274a54=_0x397f92[_0x55631e(0x138)][_0x55631e(0x212)]('user');if(!_0x274a54?.[_0x55631e(0x1fe)])return safeReply(_0x397f92,{'content':_0x55631e(0x1c5),'flags':0x40});await _0x274a54[_0x55631e(0x176)](null),await safeReply(_0x397f92,{'content':_0x55631e(0xa1)+_0x274a54[_0x55631e(0xee)][_0x55631e(0x1b6)]+'**'});}else{if(_0x9c01d8==='warn'){if(!_0x2de547['permissions'][_0x55631e(0x1a2)](PermissionsBitField[_0x55631e(0x208)][_0x55631e(0x12c)]))return safeReply(_0x397f92,{'content':_0x55631e(0xb1),'flags':0x40});const _0x167549=_0x397f92[_0x55631e(0x138)]['getUser']('user'),_0x15b0af=_0x397f92[_0x55631e(0x138)][_0x55631e(0xdc)](_0x55631e(0xf9)),_0x3da6a6=loadJSON(WARN_FILE);if(!_0x3da6a6[_0x167549['id']])_0x3da6a6[_0x167549['id']]=[];_0x3da6a6[_0x167549['id']][_0x55631e(0x15d)]({'reason':_0x15b0af,'moderator':_0x477db1[_0x55631e(0x1b6)],'timestamp':Date[_0x55631e(0x187)]()}),saveJSON(WARN_FILE,_0x3da6a6),await safeReply(_0x397f92,{'content':_0x55631e(0x215)+_0x167549[_0x55631e(0x1b6)]+_0x55631e(0x1c2)+_0x15b0af+'\x0aTổng\x20warns:\x20**'+_0x3da6a6[_0x167549['id']][_0x55631e(0x133)]+'**'});}else{if(_0x9c01d8===_0x55631e(0x1bd)){const _0x16d791=_0x397f92[_0x55631e(0x138)]['getUser']('user'),_0x2a613e=loadJSON(WARN_FILE),_0x1a8a49=_0x2a613e[_0x16d791['id']];if(!_0x1a8a49?.['length'])return safeReply(_0x397f92,{'content':'**'+_0x16d791[_0x55631e(0x1b6)]+'**\x20chưa\x20có\x20cảnh\x20cáo\x20nào!','flags':0x40});const _0x4d2af8=_0x1a8a49[_0x55631e(0x19a)]((_0xd9ef7d,_0x2161d3)=>'**'+(_0x2161d3+0x1)+'.**\x20'+_0xd9ef7d[_0x55631e(0xf9)]+_0x55631e(0x105)+_0xd9ef7d[_0x55631e(0x12b)]+'\x20—\x20'+new Date(_0xd9ef7d['timestamp'])[_0x55631e(0x125)]('vi-VN'))[_0x55631e(0x117)]('\x0a\x0a');await safeReply(_0x397f92,{'embeds':[new EmbedBuilder()['setColor'](0xffff00)[_0x55631e(0xae)](_0x55631e(0x104)+_0x16d791[_0x55631e(0x1b6)])[_0x55631e(0x20d)](_0x4d2af8)['setFooter']({'text':_0x55631e(0x10a)+_0x1a8a49[_0x55631e(0x133)]+_0x55631e(0x109)})]});}else{if(_0x9c01d8===_0x55631e(0x9b)){if(!_0x2de547[_0x55631e(0xf7)][_0x55631e(0x1a2)](PermissionsBitField['Flags'][_0x55631e(0x139)]))return safeReply(_0x397f92,{'content':'Bạn\x20không\x20có\x20quyền\x20xóa\x20warns!','flags':0x40});const _0x9ff11b=_0x397f92[_0x55631e(0x138)]['getUser'](_0x55631e(0xee)),_0x92d839=loadJSON(WARN_FILE);delete _0x92d839[_0x9ff11b['id']],saveJSON(WARN_FILE,_0x92d839),await safeReply(_0x397f92,{'content':_0x55631e(0x1bc)+_0x9ff11b[_0x55631e(0x1b6)]+'**'});}else{if(_0x9c01d8==='clear'){if(!_0x2de547['permissions'][_0x55631e(0x1a2)](PermissionsBitField[_0x55631e(0x208)]['ManageMessages']))return safeReply(_0x397f92,{'content':_0x55631e(0xe5),'flags':0x40});const _0x3899cb=_0x397f92[_0x55631e(0x138)][_0x55631e(0xd0)](_0x55631e(0x115));try{const _0x1b33d7=await _0x4e9246['bulkDelete'](_0x3899cb,!![]);await safeReply(_0x397f92,{'content':_0x55631e(0x136)+_0x1b33d7[_0x55631e(0x21f)]+_0x55631e(0x1dd),'flags':0x40});}catch{await safeReply(_0x397f92,{'content':_0x55631e(0x1af),'flags':0x40});}}else{if(_0x9c01d8===_0x55631e(0x164)){const _0x210c93=_0x397f92[_0x55631e(0x138)]['getUser'](_0x55631e(0xee))||_0x477db1;await safeReply(_0x397f92,{'embeds':[new EmbedBuilder()[_0x55631e(0x180)](0x99ff)[_0x55631e(0xae)](_0x55631e(0x1c6)+_0x210c93[_0x55631e(0x1b6)])['setImage'](_0x210c93[_0x55631e(0x1a0)]({'dynamic':!![],'size':0x400}))]});}else{if(_0x9c01d8==='serverinfo')await safeReply(_0x397f92,{'embeds':[new EmbedBuilder()[_0x55631e(0x180)](0x99ff)['setTitle'](_0x2d3f5b[_0x55631e(0x10f)])[_0x55631e(0x196)](_0x2d3f5b['iconURL']({'dynamic':!![]}))[_0x55631e(0x18e)]({'name':_0x55631e(0x118),'value':'<@'+_0x2d3f5b['ownerId']+'>','inline':!![]},{'name':_0x55631e(0x17b),'value':''+_0x2d3f5b[_0x55631e(0xa0)],'inline':!![]},{'name':'Ngày\x20tạo','value':_0x55631e(0x11b)+Math['floor'](_0x2d3f5b['createdTimestamp']/0x3e8)+_0x55631e(0x16d),'inline':!![]},{'name':_0x55631e(0x101),'value':''+_0x2d3f5b[_0x55631e(0x14b)],'inline':!![]},{'name':_0x55631e(0xd2),'value':''+(_0x2d3f5b[_0x55631e(0x99)]||0x0),'inline':!![]},{'name':'Roles','value':''+_0x2d3f5b['roles']['cache'][_0x55631e(0x21f)],'inline':!![]})[_0x55631e(0x120)]({'text':'Server\x20ID:\x20'+_0x2d3f5b['id']})[_0x55631e(0xc5)]()]});else{if(_0x9c01d8===_0x55631e(0x175)){const _0x55edbb=_0x397f92[_0x55631e(0x138)][_0x55631e(0x183)](_0x55631e(0xee))||_0x477db1,_0x7598f9=await _0x2d3f5b['members'][_0x55631e(0x203)](_0x55edbb['id'])['catch'](()=>null);if(!_0x7598f9)return safeReply(_0x397f92,{'content':_0x55631e(0x159),'flags':0x40});const _0x5cad02=_0x7598f9[_0x55631e(0xed)][_0x55631e(0x1ff)][_0x55631e(0x1f9)](_0x54c2ef=>_0x54c2ef['id']!==_0x2d3f5b['id'])[_0x55631e(0x1bf)]((_0x4bc847,_0x447032)=>_0x447032[_0x55631e(0x16c)]-_0x4bc847['position'])[_0x55631e(0x19a)](_0x303860=>_0x55631e(0xcd)+_0x303860['id']+'>');let _0x40f441=_0x5cad02[_0x55631e(0x117)](',\x20')||'Không\x20có\x20role';if(_0x40f441[_0x55631e(0x133)]>0x400)_0x40f441=_0x5cad02[_0x55631e(0x130)](0x0,0x5)[_0x55631e(0x117)](',\x20')+(_0x55631e(0x94)+(_0x5cad02[_0x55631e(0x133)]-0x5)+_0x55631e(0x223));await safeReply(_0x397f92,{'embeds':[new EmbedBuilder()[_0x55631e(0x180)](0x99ff)[_0x55631e(0xae)](_0x55edbb['tag'])['setThumbnail'](_0x55edbb[_0x55631e(0x1a0)]({'dynamic':!![]}))[_0x55631e(0x18e)]({'name':'ID','value':_0x55edbb['id'],'inline':!![]},{'name':_0x55631e(0x14c),'value':_0x7598f9[_0x55631e(0x1ef)]||_0x55631e(0x173),'inline':!![]},{'name':_0x55631e(0xf0),'value':_0x55edbb[_0x55631e(0xfb)]?'Có':_0x55631e(0x150),'inline':!![]},{'name':_0x55631e(0x22d),'value':'<t:'+Math[_0x55631e(0xcc)](_0x55edbb[_0x55631e(0x1fc)]/0x3e8)+_0x55631e(0x16d),'inline':!![]},{'name':_0x55631e(0x1e9),'value':_0x55631e(0x11b)+Math[_0x55631e(0xcc)](_0x7598f9[_0x55631e(0x96)]/0x3e8)+':R>','inline':!![]},{'name':_0x55631e(0x17d),'value':_0x40f441,'inline':![]})[_0x55631e(0x120)]({'text':_0x55631e(0x13b)+_0x55edbb['id']})['setTimestamp']()]});}else{if(_0x9c01d8===_0x55631e(0xb2)){const _0x1f65f9=_0x397f92[_0x55631e(0x138)][_0x55631e(0xdc)](_0x55631e(0x11c)),_0x327af3=['Chắc\x20chắn\x20rồi!',_0x55631e(0x106),'Có\x20thể\x20lắm!','Có\x20vẻ\x20tốt\x20đấy!',_0x55631e(0xca),_0x55631e(0x1f4),_0x55631e(0x1f0),_0x55631e(0x19f),_0x55631e(0x22b)];await safeReply(_0x397f92,{'embeds':[new EmbedBuilder()[_0x55631e(0x180)](0x99ff)[_0x55631e(0xae)]('Magic\x208-Ball')['addFields']({'name':_0x55631e(0xda),'value':_0x1f65f9},{'name':_0x55631e(0x145),'value':_0x327af3[Math[_0x55631e(0xcc)](Math['random']()*_0x327af3[_0x55631e(0x133)])]})]});}else{if(_0x9c01d8==='coinflip')await safeReply(_0x397f92,{'content':_0x55631e(0x1e0)+(Math[_0x55631e(0x15a)]()<0.5?'Ngửa':_0x55631e(0x1c3))+'**'});else{if(_0x9c01d8===_0x55631e(0x177)){const _0x315083=_0x397f92[_0x55631e(0x138)]['getInteger'](_0x55631e(0x10b))||0x6,_0x5d6880=Math['floor'](Math[_0x55631e(0x15a)]()*_0x315083)+0x1;await safeReply(_0x397f92,{'content':_0x55631e(0xa8)+_0x5d6880+_0x55631e(0x225)+_0x315083});}else{if(_0x9c01d8===_0x55631e(0x1e6)){const _0x48d00f=_0x397f92['options']['getString'](_0x55631e(0xd1));await safeReply(_0x397f92,{'content':_0x55631e(0xf4),'flags':0x40}),await _0x4e9246[_0x55631e(0xfa)](_0x48d00f);}else{if(_0x9c01d8==='poll'){const _0x1aebed=_0x397f92['options'][_0x55631e(0xdc)](_0x55631e(0x11c)),_0x188bbd=[_0x397f92[_0x55631e(0x138)][_0x55631e(0xdc)](_0x55631e(0x149)),_0x397f92[_0x55631e(0x138)][_0x55631e(0xdc)](_0x55631e(0xa2)),_0x397f92[_0x55631e(0x138)][_0x55631e(0xdc)](_0x55631e(0x1eb)),_0x397f92[_0x55631e(0x138)]['getString'](_0x55631e(0x119))]['filter'](Boolean),_0x22c1bb=['1️⃣',_0x55631e(0x114),'3️⃣',_0x55631e(0x112)],_0x55d4eb=await _0x4e9246[_0x55631e(0xfa)]({'embeds':[new EmbedBuilder()['setColor'](0x99ff)[_0x55631e(0xae)](_0x55631e(0x20e))[_0x55631e(0x20d)]('**'+_0x1aebed+_0x55631e(0x1d9)+_0x188bbd[_0x55631e(0x19a)]((_0x57df34,_0x329893)=>_0x22c1bb[_0x329893]+'\x20'+_0x57df34)[_0x55631e(0x117)]('\x0a'))['setFooter']({'text':_0x55631e(0x20a)+_0x477db1['tag']})['setTimestamp']()]});for(let _0x9e330d=0x0;_0x9e330d<_0x188bbd[_0x55631e(0x133)];_0x9e330d++)await _0x55d4eb[_0x55631e(0x218)](_0x22c1bb[_0x9e330d]);await safeReply(_0x397f92,{'content':_0x55631e(0xb9),'flags':0x40});}else{if(_0x9c01d8===_0x55631e(0x11d))await safeReply(_0x397f92,{'content':_0x2de547[_0x55631e(0xed)][_0x55631e(0x1ff)]['has'](ADMIN_ROLE_ID)?_0x55631e(0x20f):_0x55631e(0x132)});else{if(_0x9c01d8===_0x55631e(0x110)){await _0x397f92[_0x55631e(0x168)]({'content':_0x55631e(0xff)});const _0x15e385=client['ws']['ping'];await _0x397f92['editReply']({'content':null,'embeds':[new EmbedBuilder()[_0x55631e(0x180)](_0x15e385<0x64?0xff00:_0x15e385<0xc8?0xffff00:0xff0000)[_0x55631e(0xae)](_0x55631e(0x207))[_0x55631e(0x18e)]({'name':_0x55631e(0xd4),'value':Math[_0x55631e(0xe7)](_0x15e385)+'ms','inline':!![]})]});}else _0x9c01d8===_0x55631e(0xad)&&await safeReply(_0x397f92,{'embeds':[new EmbedBuilder()['setColor'](0x99ff)[_0x55631e(0xae)](_0x55631e(0x209))[_0x55631e(0x18e)]({'name':_0x55631e(0x21b),'value':'`/kick`\x20`/ban`\x20`/unban`\x20`/mute`\x20`/unmute`\x20`/warn`\x20`/warnings`\x20`/clearwarns`\x20`/clear`'},{'name':_0x55631e(0x16e),'value':'`/avatar`\x20`/serverinfo`\x20`/userinfo`\x20`/8ball`\x20`/coinflip`\x20`/roll`\x20`/say`\x20`/poll`'},{'name':'AI','value':'`/vh`\x20—\x20Việt\x20hóa\x20file\x20config\x20Minecraft\x20(cần\x20Gemini\x20API\x20Key)'},{'name':_0x55631e(0x1ee),'value':'`/ping`\x20`/help`'})[_0x55631e(0x120)]({'text':_0x55631e(0x1d2)})[_0x55631e(0xc5)]()]});}}}}}}}}}}}}}}}}}}}catch(_0x2b028b){console[_0x55631e(0x116)](_0x55631e(0x19e)+_0x9c01d8+':',_0x2b028b),await safeReply(_0x397f92,{'content':_0x55631e(0x1b3),'flags':0x40});}}),client['on']('messageCreate',async _0x7a2d7d=>{const _0xd8253=_0xcd3d8d;if(_0x7a2d7d[_0xd8253(0x1d0)][_0xd8253(0xfb)])return;if(!_0x7a2d7d[_0xd8253(0x174)]){const _0x79dc52=awaitingToken[_0xd8253(0x16f)](_0x7a2d7d['author']['id']);if(_0x79dc52){const _0x7811b7=_0x7a2d7d['content']['trim']();clearTimeout(_0x79dc52[_0xd8253(0x176)]),awaitingToken[_0xd8253(0xc9)](_0x7a2d7d['author']['id']),userTokens['set'](_0x7a2d7d[_0xd8253(0x1d0)]['id'],_0x7811b7),await _0x7a2d7d[_0xd8253(0x168)]({'embeds':[new EmbedBuilder()[_0xd8253(0x180)](COLORS[_0xd8253(0x1a6)])[_0xd8253(0xae)](_0xd8253(0xd6))['setDescription']('API\x20Key\x20của\x20bạn\x20đã\x20được\x20lưu\x20thành\x20công!\x0aQuay\x20lại\x20server\x20và\x20dùng\x20lệnh\x20`/vh`\x20ngay!')[_0xd8253(0xc5)]()]});}return;}console[_0xd8253(0x200)]('['+_0x7a2d7d['guild'][_0xd8253(0x10f)]+']\x20'+_0x7a2d7d[_0xd8253(0x1d0)]['tag']+':\x20'+_0x7a2d7d[_0xd8253(0xe3)]);}),client[_0xcd3d8d(0x211)](_0xcd3d8d(0xbf),async()=>{const _0x4896f2=_0xcd3d8d;console[_0x4896f2(0x200)](_0x4896f2(0x216)+client[_0x4896f2(0xee)][_0x4896f2(0x1b6)]),console[_0x4896f2(0x200)](_0x4896f2(0x15b)+OWNER_IDS[_0x4896f2(0x133)]+_0x4896f2(0x18c)+OWNER_IDS[_0x4896f2(0x117)](',\x20')),client[_0x4896f2(0xee)][_0x4896f2(0x189)](_0x4896f2(0x127),{'type':ActivityType[_0x4896f2(0xf5)]});const _0xdc33d8=[new SlashCommandBuilder()['setName']('vh')[_0x4896f2(0x20d)](_0x4896f2(0xfe))['addAttachmentOption'](_0x3bb89d=>_0x3bb89d['setName'](_0x4896f2(0x20c))[_0x4896f2(0x20d)](_0x4896f2(0x162))[_0x4896f2(0x1ea)](!![])),new SlashCommandBuilder()[_0x4896f2(0x13f)](_0x4896f2(0x1b1))[_0x4896f2(0x20d)](_0x4896f2(0x1b9))['addUserOption'](_0x1cdda7=>_0x1cdda7['setName'](_0x4896f2(0xee))[_0x4896f2(0x20d)](_0x4896f2(0x140))[_0x4896f2(0x1ea)](!![]))[_0x4896f2(0x158)](_0x187f17=>_0x187f17['setName'](_0x4896f2(0xf9))[_0x4896f2(0x20d)](_0x4896f2(0x135))),new SlashCommandBuilder()['setName'](_0x4896f2(0x1d5))['setDescription'](_0x4896f2(0x224))[_0x4896f2(0x1e8)](_0x10d122=>_0x10d122['setName'](_0x4896f2(0xee))['setDescription'](_0x4896f2(0x21a))['setRequired'](!![]))[_0x4896f2(0x158)](_0x271660=>_0x271660[_0x4896f2(0x13f)](_0x4896f2(0xf9))['setDescription']('Lý\x20do')),new SlashCommandBuilder()['setName'](_0x4896f2(0xb7))[_0x4896f2(0x20d)]('Gỡ\x20ban')[_0x4896f2(0x158)](_0x46fe62=>_0x46fe62[_0x4896f2(0x13f)](_0x4896f2(0x1d6))['setDescription'](_0x4896f2(0xac))[_0x4896f2(0x1ea)](!![])),new SlashCommandBuilder()['setName'](_0x4896f2(0x1cd))[_0x4896f2(0x20d)](_0x4896f2(0x205))[_0x4896f2(0x1e8)](_0x995ead=>_0x995ead[_0x4896f2(0x13f)](_0x4896f2(0xee))[_0x4896f2(0x20d)](_0x4896f2(0x15c))[_0x4896f2(0x1ea)](!![]))[_0x4896f2(0x22c)](_0x3e6671=>_0x3e6671[_0x4896f2(0x13f)](_0x4896f2(0xe6))['setDescription'](_0x4896f2(0x195))['setRequired'](!![])['setMinValue'](0x1)[_0x4896f2(0x1ae)](0x9d80))[_0x4896f2(0x158)](_0x5a8481=>_0x5a8481[_0x4896f2(0x13f)](_0x4896f2(0xf9))[_0x4896f2(0x20d)](_0x4896f2(0x135))),new SlashCommandBuilder()[_0x4896f2(0x13f)](_0x4896f2(0x21e))[_0x4896f2(0x20d)](_0x4896f2(0xeb))[_0x4896f2(0x1e8)](_0x1ac3b2=>_0x1ac3b2[_0x4896f2(0x13f)]('user')['setDescription'](_0x4896f2(0x1ac))[_0x4896f2(0x1ea)](!![])),new SlashCommandBuilder()[_0x4896f2(0x13f)]('warn')[_0x4896f2(0x20d)]('Cảnh\x20cáo\x20thành\x20viên')['addUserOption'](_0x314fd5=>_0x314fd5[_0x4896f2(0x13f)](_0x4896f2(0xee))[_0x4896f2(0x20d)](_0x4896f2(0xab))[_0x4896f2(0x1ea)](!![]))[_0x4896f2(0x158)](_0x3a6541=>_0x3a6541['setName'](_0x4896f2(0xf9))[_0x4896f2(0x20d)](_0x4896f2(0x135))[_0x4896f2(0x1ea)](!![])),new SlashCommandBuilder()[_0x4896f2(0x13f)]('warnings')['setDescription']('Xem\x20danh\x20sách\x20warns')[_0x4896f2(0x1e8)](_0x5c7539=>_0x5c7539['setName'](_0x4896f2(0xee))[_0x4896f2(0x20d)]('Người\x20cần\x20xem')[_0x4896f2(0x1ea)](!![])),new SlashCommandBuilder()['setName'](_0x4896f2(0x9b))[_0x4896f2(0x20d)](_0x4896f2(0x190))[_0x4896f2(0x1e8)](_0x444117=>_0x444117[_0x4896f2(0x13f)]('user')[_0x4896f2(0x20d)](_0x4896f2(0xbb))[_0x4896f2(0x1ea)](!![])),new SlashCommandBuilder()[_0x4896f2(0x13f)]('clear')['setDescription'](_0x4896f2(0x113))[_0x4896f2(0x22c)](_0x50defb=>_0x50defb[_0x4896f2(0x13f)](_0x4896f2(0x115))[_0x4896f2(0x20d)]('Số\x20tin\x20nhắn\x20(1-100)')['setRequired'](!![])['setMinValue'](0x1)[_0x4896f2(0x1ae)](0x64)),new SlashCommandBuilder()[_0x4896f2(0x13f)](_0x4896f2(0x164))[_0x4896f2(0x20d)]('Xem\x20avatar')[_0x4896f2(0x1e8)](_0x3641d7=>_0x3641d7[_0x4896f2(0x13f)](_0x4896f2(0xee))[_0x4896f2(0x20d)](_0x4896f2(0xf1))),new SlashCommandBuilder()[_0x4896f2(0x13f)](_0x4896f2(0x1ec))[_0x4896f2(0x20d)]('Thông\x20tin\x20server'),new SlashCommandBuilder()['setName'](_0x4896f2(0x175))['setDescription'](_0x4896f2(0x1bb))[_0x4896f2(0x1e8)](_0x57784e=>_0x57784e[_0x4896f2(0x13f)](_0x4896f2(0xee))['setDescription'](_0x4896f2(0xf1))),new SlashCommandBuilder()['setName'](_0x4896f2(0xb2))[_0x4896f2(0x20d)](_0x4896f2(0xf6))[_0x4896f2(0x158)](_0x2f91d9=>_0x2f91d9[_0x4896f2(0x13f)]('question')[_0x4896f2(0x20d)](_0x4896f2(0xda))['setRequired'](!![])),new SlashCommandBuilder()[_0x4896f2(0x13f)](_0x4896f2(0xce))['setDescription']('Tung\x20đồng\x20xu'),new SlashCommandBuilder()[_0x4896f2(0x13f)]('roll')[_0x4896f2(0x20d)](_0x4896f2(0x9e))['addIntegerOption'](_0x922481=>_0x922481[_0x4896f2(0x13f)](_0x4896f2(0x10b))[_0x4896f2(0x20d)](_0x4896f2(0x201))['setMinValue'](0x2)[_0x4896f2(0x1ae)](0x64)),new SlashCommandBuilder()['setName'](_0x4896f2(0x1e6))['setDescription'](_0x4896f2(0x178))[_0x4896f2(0x158)](_0x1d0a93=>_0x1d0a93[_0x4896f2(0x13f)](_0x4896f2(0xd1))[_0x4896f2(0x20d)]('Tin\x20nhắn')[_0x4896f2(0x1ea)](!![])),new SlashCommandBuilder()[_0x4896f2(0x13f)](_0x4896f2(0x186))['setDescription'](_0x4896f2(0x220))['addStringOption'](_0x51159f=>_0x51159f[_0x4896f2(0x13f)](_0x4896f2(0x11c))[_0x4896f2(0x20d)](_0x4896f2(0xda))['setRequired'](!![]))[_0x4896f2(0x158)](_0x29f209=>_0x29f209[_0x4896f2(0x13f)](_0x4896f2(0x149))[_0x4896f2(0x20d)](_0x4896f2(0xe8))['setRequired'](!![]))[_0x4896f2(0x158)](_0x31bb4e=>_0x31bb4e['setName'](_0x4896f2(0xa2))['setDescription'](_0x4896f2(0x14a))[_0x4896f2(0x1ea)](!![]))['addStringOption'](_0x2e20bd=>_0x2e20bd[_0x4896f2(0x13f)](_0x4896f2(0x1eb))[_0x4896f2(0x20d)](_0x4896f2(0x111)))[_0x4896f2(0x158)](_0x148e3f=>_0x148e3f['setName']('option4')[_0x4896f2(0x20d)](_0x4896f2(0x22f))),new SlashCommandBuilder()[_0x4896f2(0x13f)](_0x4896f2(0x11d))['setDescription'](_0x4896f2(0x137)),new SlashCommandBuilder()[_0x4896f2(0x13f)](_0x4896f2(0x110))[_0x4896f2(0x20d)]('Kiểm\x20tra\x20ping'),new SlashCommandBuilder()[_0x4896f2(0x13f)]('help')[_0x4896f2(0x20d)](_0x4896f2(0x1cf))];try{const _0x1cf951=new REST({'version':'10'})[_0x4896f2(0x18d)](TOKEN);await _0x1cf951[_0x4896f2(0x95)](Routes[_0x4896f2(0x152)](CLIENT_ID,GUILD_ID),{'body':_0xdc33d8}),console[_0x4896f2(0x200)](_0x4896f2(0x1e3));}catch(_0x20481f){console['error'](_0x4896f2(0x198),_0x20481f);}}),process['on']('unhandledRejection',_0x1a57e4=>console['error'](_0xcd3d8d(0x143),_0x1a57e4)),process['on'](_0xcd3d8d(0x1c8),_0xb34b26=>console['error'](_0xcd3d8d(0x123),_0xb34b26)),client[_0xcd3d8d(0x9d)](TOKEN);
+import {
+  Client,
+  GatewayIntentBits,
+  SlashCommandBuilder,
+  REST,
+  Routes,
+  PermissionsBitField,
+  ActivityType,
+  EmbedBuilder,
+  ButtonBuilder,
+  ButtonStyle,
+  ActionRowBuilder,
+  AttachmentBuilder,
+  Partials,
+} from "discord.js";
+import fs from "fs";
+import dotenv from "dotenv";
+
+dotenv.config();
+
+/*
+  CONFIG — file .env cần có:
+    TOKEN=your_bot_token_here
+    CLIENT_ID=your_client_id
+    GUILD_ID=your_guild_id
+    ADMIN_ROLE_ID=your_admin_role_id
+    OWNER_USER_IDS=id1,id2,id3
+    WELCOME_CHANNEL_ID=channel_id_welcome
+    GOODBYE_CHANNEL_ID=channel_id_goodbye
+*/
+const TOKEN              = process.env.TOKEN;
+const CLIENT_ID          = process.env.CLIENT_ID;
+const GUILD_ID           = process.env.GUILD_ID;
+const ADMIN_ROLE_ID      = process.env.ADMIN_ROLE_ID || "123456789012345678";
+const WELCOME_CHANNEL_ID = process.env.WELCOME_CHANNEL_ID;
+const GOODBYE_CHANNEL_ID = process.env.GOODBYE_CHANNEL_ID;
+
+const OWNER_IDS = process.env.OWNER_USER_IDS
+  ? process.env.OWNER_USER_IDS.split(",").map((id) => id.trim()).filter(Boolean)
+  : ["1444578804189102221"];
+
+const WARN_FILE    = "./warns.json";
+const ALLOWED_FILE = "./allowed_guilds.json";
+
+const WELCOME_GIF = "https://media1.tenor.com/m/2NroV6Irul0AAAAd/mixigaming.gif";
+const GOODBYE_GIF = "https://media1.tenor.com/m/bmfPgjAQ5ucAAAAd/doakes-doakes-sad.gif";
+
+if (!TOKEN) {
+  console.error("[FATAL] TOKEN chưa được đặt trong .env!");
+  process.exit(1);
+}
+if (!CLIENT_ID || !GUILD_ID) {
+  console.error("[FATAL] Thiếu CLIENT_ID hoặc GUILD_ID trong .env!");
+  process.exit(1);
+}
+
+const client = new Client({
+  intents: [
+    GatewayIntentBits.Guilds,
+    GatewayIntentBits.GuildMessages,
+    GatewayIntentBits.MessageContent,
+    GatewayIntentBits.GuildMembers,
+    GatewayIntentBits.GuildVoiceStates,
+    GatewayIntentBits.DirectMessages,
+  ],
+  partials: [Partials.Channel, Partials.Message, Partials.User],
+});
+
+const pendingGuilds = new Map();
+const userTokens    = new Map();
+const awaitingToken = new Map();
+
+const COLORS = {
+  INFO:    "#3498db",
+  SUCCESS: "#2ecc71",
+  WARNING: "#f39c12",
+  ERROR:   "#e74c3c",
+  WELCOME: "#57F287",
+  GOODBYE: "#ED4245",
+};
+
+/* ---- FILE I/O ---- */
+const loadJSON = (file) => {
+  try {
+    if (!fs.existsSync(file)) { fs.writeFileSync(file, "{}", "utf-8"); return {}; }
+    const raw = fs.readFileSync(file, "utf-8").trim();
+    return raw ? JSON.parse(raw) : {};
+  } catch (err) {
+    console.error(`[JSON] Lỗi đọc ${file}:`, err.message);
+    return {};
+  }
+};
+
+const saveJSON = (file, data) => {
+  try { fs.writeFileSync(file, JSON.stringify(data, null, 2), "utf-8"); }
+  catch (err) { console.error(`[JSON] Lỗi ghi ${file}:`, err.message); }
+};
+
+/* ---- HELPERS ---- */
+const safeReply = async (interaction, options) => {
+  try {
+    if (interaction.replied || interaction.deferred) return await interaction.editReply(options);
+    return await interaction.reply(options);
+  } catch (err) {
+    console.error("[safeReply]", err.message);
+  }
+};
+
+const safeLeave = async (guild, reason = "") => {
+  try {
+    await guild.leave();
+    console.log(`[ANTI-RAID] Rời "${guild.name}". Lý do: ${reason}`);
+  } catch (err) {
+    console.error(`[ANTI-RAID] Không thể rời "${guild.name}":`, err.message);
+  }
+};
+
+/* ---- EMBED BUILDERS ---- */
+function createEmbed(title, description, color, author = null, fields = []) {
+  const embed = new EmbedBuilder()
+    .setTitle(title)
+    .setDescription(description)
+    .setColor(color)
+    .setTimestamp();
+  if (author) embed.setAuthor({ name: author.name, iconURL: author.iconURL });
+  if (fields.length > 0) embed.addFields(fields);
+  return embed;
+}
+
+function createProcessingEmbed(fileName, step = 0) {
+  const animations = ["Đang Việt Hóa", "Đang Việt Hóa.", "Đang Việt Hóa..", "Đang Việt Hóa..."];
+  const stages     = ["Đang phân tích cấu trúc file...", "Đang xử lý nội dung...", "Đang dịch văn bản...", "Đang hoàn thiện file..."];
+  return new EmbedBuilder()
+    .setTitle(animations[step])
+    .setDescription(`Đang xử lý file \`${fileName}\`. Vui lòng đợi...`)
+    .setColor(COLORS.INFO)
+    .addFields(
+      { name: "Trạng Thái", value: stages[step], inline: true },
+      { name: "File",       value: fileName,     inline: true }
+    )
+    .setFooter({ text: "Vui lòng đợi trong giây lát..." })
+    .setTimestamp();
+}
+
+function createTokenRequestEmbed() {
+  return new EmbedBuilder()
+    .setColor(COLORS.WARNING)
+    .setTitle("Cần Gemini API Token")
+    .setDescription(
+      "Lệnh `/vh` sử dụng **Google Gemini AI** để việt hóa file.\n" +
+      "Bạn cần cung cấp **API Key** của riêng mình để tiếp tục.\n\n" +
+      "**Hướng dẫn lấy API Key miễn phí:**\n" +
+      "1. Truy cập: https://aistudio.google.com/app/apikey\n" +
+      "2. Đăng nhập bằng tài khoản Google\n" +
+      "3. Nhấn **Create API Key**\n" +
+      "4. Copy key và nhấn **Add Token** bên dưới\n\n" +
+      "Token chỉ lưu trong phiên hiện tại, không lưu vĩnh viễn."
+    )
+    .setFooter({ text: "Token sẽ được gửi qua tin nhắn riêng để bảo mật" })
+    .setTimestamp();
+}
+
+function createWelcomeEmbed(member) {
+  return new EmbedBuilder()
+    .setColor(COLORS.WELCOME)
+    .setTitle("Chào mừng thành viên mới!")
+    .setDescription(
+      `Chào <@${member.id}>, chào mừng đến với **${member.guild.name}**!\n` +
+      `Hãy đọc nội quy server và tận hưởng thời gian tại đây nhé.`
+    )
+    .setThumbnail(member.user.displayAvatarURL({ dynamic: true, size: 256 }))
+    .setImage(WELCOME_GIF)
+    .addFields(
+      { name: "Thành viên thứ",   value: `${member.guild.memberCount}`, inline: true },
+      { name: "Tài khoản tạo lúc", value: `<t:${Math.floor(member.user.createdTimestamp / 1000)}:R>`, inline: true }
+    )
+    .setFooter({ text: `ID: ${member.id}` })
+    .setTimestamp();
+}
+
+function createGoodbyeEmbed(member) {
+  return new EmbedBuilder()
+    .setColor(COLORS.GOODBYE)
+    .setTitle("Tạm biệt thành viên!")
+    .setDescription(
+      `**${member.user.tag}** đã rời khỏi **${member.guild.name}**.\n` +
+      `Chúc bạn mọi điều tốt lành!`
+    )
+    .setThumbnail(member.user.displayAvatarURL({ dynamic: true, size: 256 }))
+    .setImage(GOODBYE_GIF)
+    .addFields(
+      { name: "Còn lại",  value: `${member.guild.memberCount} thành viên`, inline: true },
+      { name: "Đã vào lúc", value: member.joinedTimestamp ? `<t:${Math.floor(member.joinedTimestamp / 1000)}:R>` : "Không rõ", inline: true }
+    )
+    .setFooter({ text: `ID: ${member.id}` })
+    .setTimestamp();
+}
+
+
+/* ================================================================= */
+/*  EVENTS                                                            */
+/* ================================================================= */
+
+/* ---- WELCOME + ANTI-CLONE ---- */
+client.on("guildMemberAdd", async (member) => {
+  const age = Date.now() - member.user.createdTimestamp;
+  if (age < 3 * 24 * 60 * 60 * 1000) {
+    try {
+      await member.kick("Anti-Clone: Tài khoản quá mới");
+      console.log(`[ANTI-CLONE] Kicked ${member.user.tag} (${Math.floor(age / 86400000)} ngày tuổi)`);
+    } catch (err) {
+      console.error(`[ANTI-CLONE] Không thể kick ${member.user.tag}:`, err.message);
+    }
+    return;
+  }
+
+  if (!WELCOME_CHANNEL_ID) return;
+  try {
+    const channel = await member.guild.channels.fetch(WELCOME_CHANNEL_ID);
+    if (channel) await channel.send({ embeds: [createWelcomeEmbed(member)] });
+  } catch (err) {
+    console.error("[WELCOME] Lỗi gửi embed:", err.message);
+  }
+});
+
+/* ---- GOODBYE ---- */
+client.on("guildMemberRemove", async (member) => {
+  if (!GOODBYE_CHANNEL_ID) return;
+  try {
+    const channel = await member.guild.channels.fetch(GOODBYE_CHANNEL_ID);
+    if (channel) await channel.send({ embeds: [createGoodbyeEmbed(member)] });
+  } catch (err) {
+    console.error("[GOODBYE] Lỗi gửi embed:", err.message);
+  }
+});
+
+/* ---- ANTI-RAID guildCreate ---- */
+client.on("guildCreate", async (guild) => {
+  const allowedGuilds = loadJSON(ALLOWED_FILE);
+  if (allowedGuilds[guild.id]) {
+    console.log(`[ANTI-RAID] Guild đã được duyệt: "${guild.name}"`);
+    return;
+  }
+
+  console.log(`[ANTI-RAID] Bot vào guild mới: "${guild.name}" (${guild.id})`);
+
+  let invitedBy = "Không rõ";
+  try {
+    const logs  = await guild.fetchAuditLogs({ type: 28, limit: 5 });
+    const entry = logs.entries.find((e) => e.target?.id === CLIENT_ID);
+    if (entry?.executor) invitedBy = `${entry.executor.tag} (${entry.executor.id})`;
+  } catch {
+    console.warn(`[ANTI-RAID] Không lấy được audit log của "${guild.name}"`);
+  }
+
+  const embed = new EmbedBuilder()
+    .setColor(0xff6600)
+    .setTitle("Bot được mời vào Server mới!")
+    .setThumbnail(client.user.displayAvatarURL({ dynamic: true, size: 256 }))
+    .addFields(
+      { name: "Bot",        value: client.user.tag,        inline: true },
+      { name: "Bot ID",     value: client.user.id,         inline: true },
+      { name: "\u200B",     value: "\u200B",               inline: false },
+      { name: "Server",     value: guild.name,             inline: true },
+      { name: "Server ID",  value: guild.id,               inline: true },
+      { name: "Thành viên", value: `${guild.memberCount}`, inline: true },
+      { name: "Thêm bởi",   value: invitedBy,              inline: false }
+    )
+    .setFooter({ text: "Tự động từ chối sau 5 phút nếu không ai phản hồi." })
+    .setTimestamp();
+
+  const row = new ActionRowBuilder().addComponents(
+    new ButtonBuilder().setCustomId(`approve_${guild.id}`).setLabel("Đồng Ý").setStyle(ButtonStyle.Success),
+    new ButtonBuilder().setCustomId(`reject_${guild.id}`).setLabel("Từ Chối").setStyle(ButtonStyle.Danger)
+  );
+
+  let dmSent = 0;
+  for (const ownerId of OWNER_IDS) {
+    try {
+      const ownerUser = await client.users.fetch(ownerId, { force: true });
+      const dmChannel = await ownerUser.createDM();
+      await dmChannel.send({ embeds: [embed], components: [row] });
+      dmSent++;
+      console.log(`[ANTI-RAID] Đã gửi DM → ${ownerUser.tag}`);
+    } catch (err) {
+      console.error(`[ANTI-RAID] Không gửi được DM cho ${ownerId}: ${err.message}`);
+    }
+  }
+
+  if (dmSent === 0) {
+    console.error("[ANTI-RAID] Không liên hệ được owner nào. Tự rời guild.");
+    await safeLeave(guild, "Không liên hệ được owner");
+    return;
+  }
+
+  pendingGuilds.set(guild.id, {
+    approvals:  new Set(),
+    rejections: new Set(),
+    timeout: setTimeout(async () => {
+      const allowed = loadJSON(ALLOWED_FILE);
+      if (!allowed[guild.id]) {
+        pendingGuilds.delete(guild.id);
+        await safeLeave(guild, "Timeout 5 phút không có phản hồi");
+      }
+    }, 5 * 60 * 1000),
+  });
+});
+
+/* ---- INTERACTIONS ---- */
+client.on("interactionCreate", async (interaction) => {
+
+  if (interaction.isButton()) {
+    const { customId } = interaction;
+    const userId       = interaction.user.id;
+
+    if (customId.startsWith("approve_") || customId.startsWith("reject_")) {
+      const [action, guildId] = customId.split("_");
+
+      if (!OWNER_IDS.includes(userId))
+        return interaction.reply({ content: "Bạn không có quyền thực hiện hành động này!", flags: 64 });
+
+      const pending       = pendingGuilds.get(guildId);
+      const allowedGuilds = loadJSON(ALLOWED_FILE);
+
+      if (allowedGuilds[guildId])
+        return interaction.reply({ content: "Server này đã được duyệt trước đó rồi!", flags: 64 });
+      if (!pending && !allowedGuilds[guildId])
+        return interaction.reply({ content: "Yêu cầu này đã hết hạn hoặc đã xử lý.", flags: 64 });
+
+      const guild     = client.guilds.cache.get(guildId);
+      const guildName = guild ? guild.name : `ID: ${guildId}`;
+
+      if (action === "approve") {
+        allowedGuilds[guildId] = { approvedAt: Date.now(), approvedBy: interaction.user.tag };
+        saveJSON(ALLOWED_FILE, allowedGuilds);
+        if (pending) { clearTimeout(pending.timeout); pendingGuilds.delete(guildId); }
+
+        try {
+          await interaction.update({
+            embeds: [new EmbedBuilder().setColor(0x00ff00).setTitle("Đã Duyệt!").setDescription(`Bot được phép hoạt động tại **${guildName}**.\nDuyệt bởi: ${interaction.user.tag}`).setTimestamp()],
+            components: [],
+          });
+        } catch { await interaction.reply({ content: `Đã duyệt **${guildName}**!`, flags: 64 }); }
+
+        for (const oid of OWNER_IDS) {
+          if (oid === userId) continue;
+          try {
+            const other = await client.users.fetch(oid, { force: true });
+            await (await other.createDM()).send({ embeds: [new EmbedBuilder().setColor(0x00ff00).setTitle("Server đã được duyệt").setDescription(`**${guildName}** đã được **${interaction.user.tag}** duyệt.`).setTimestamp()] });
+          } catch { /* ignore */ }
+        }
+        console.log(`[ANTI-RAID] DUYỆT "${guildName}" bởi ${interaction.user.tag}`);
+
+      } else if (action === "reject") {
+        if (pending) { clearTimeout(pending.timeout); pendingGuilds.delete(guildId); }
+
+        try {
+          await interaction.update({
+            embeds: [new EmbedBuilder().setColor(0xff0000).setTitle("Đã Từ Chối!").setDescription(`Bot đã rời **${guildName}**.\nTừ chối bởi: ${interaction.user.tag}`).setTimestamp()],
+            components: [],
+          });
+        } catch { await interaction.reply({ content: `Đã từ chối **${guildName}**!`, flags: 64 }); }
+
+        for (const oid of OWNER_IDS) {
+          if (oid === userId) continue;
+          try {
+            const other = await client.users.fetch(oid, { force: true });
+            await (await other.createDM()).send({ embeds: [new EmbedBuilder().setColor(0xff0000).setTitle("Server đã bị từ chối").setDescription(`**${guildName}** đã bị **${interaction.user.tag}** từ chối.`).setTimestamp()] });
+          } catch { /* ignore */ }
+        }
+
+        if (guild) await safeLeave(guild, `Bị từ chối bởi ${interaction.user.tag}`);
+        console.log(`[ANTI-RAID] TỪ CHỐI "${guildName}" bởi ${interaction.user.tag}`);
+      }
+      return;
+    }
+
+    if (customId.startsWith("addtoken_")) {
+      const targetUserId = customId.split("_")[1];
+      if (userId !== targetUserId)
+        return interaction.reply({ content: "Đây không phải nút của bạn!", flags: 64 });
+
+      try {
+        await interaction.user.send({
+          embeds: [
+            new EmbedBuilder()
+              .setColor(COLORS.SUCCESS)
+              .setTitle("Nhập Gemini API Token")
+              .setDescription(
+                "Vui lòng **gửi API Key** của bạn vào đây (tin nhắn tiếp theo).\n\n" +
+                "Lấy key tại: https://aistudio.google.com/app/apikey\n\n" +
+                "Bạn có **2 phút** để nhập token.\n" +
+                "Token chỉ dùng cho phiên hiện tại, không lưu vĩnh viễn."
+              )
+              .setFooter({ text: "Chỉ gửi token trong tin nhắn riêng này để bảo mật!" }),
+          ],
+        });
+
+        awaitingToken.set(userId, {
+          timeout: setTimeout(() => awaitingToken.delete(userId), 2 * 60 * 1000),
+        });
+
+        await interaction.update({
+          embeds: [
+            new EmbedBuilder()
+              .setColor(COLORS.SUCCESS)
+              .setTitle("Đã Gửi Hướng Dẫn!")
+              .setDescription("Kiểm tra **tin nhắn riêng** từ bot và nhập API Key vào đó!\nSau khi nhập xong, dùng lại lệnh `/vh`.")
+              .setTimestamp(),
+          ],
+          components: [],
+        });
+      } catch {
+        await interaction.update({
+          embeds: [
+            new EmbedBuilder()
+              .setColor(COLORS.ERROR)
+              .setTitle("Không Thể Gửi DM")
+              .setDescription("Hãy bật **Cho phép tin nhắn riêng từ thành viên server** trong cài đặt Discord rồi thử lại!")
+              .setTimestamp(),
+          ],
+          components: [],
+        });
+      }
+      return;
+    }
+
+    if (customId.startsWith("skiptoken_")) {
+      const targetUserId = customId.split("_")[1];
+      if (userId !== targetUserId)
+        return interaction.reply({ content: "Đây không phải nút của bạn!", flags: 64 });
+
+      await interaction.update({
+        embeds: [
+          new EmbedBuilder()
+            .setColor(COLORS.ERROR)
+            .setTitle("Đã Hủy")
+            .setDescription("Bạn cần thêm **Gemini API Token** để sử dụng lệnh `/vh`.\nDùng lại lệnh `/vh` khi bạn đã sẵn sàng!")
+            .setTimestamp(),
+        ],
+        components: [],
+      });
+      return;
+    }
+
+    return;
+  }
+
+  if (!interaction.isChatInputCommand()) return;
+
+  const { commandName, user, member, channel, guild } = interaction;
+
+  try {
+
+    if (commandName === "vh") {
+      const existingToken = userTokens.get(user.id);
+      if (!existingToken) {
+        const row = new ActionRowBuilder().addComponents(
+          new ButtonBuilder().setCustomId(`addtoken_${user.id}`).setLabel("Add Token").setStyle(ButtonStyle.Success),
+          new ButtonBuilder().setCustomId(`skiptoken_${user.id}`).setLabel("Không Add").setStyle(ButtonStyle.Danger)
+        );
+        return safeReply(interaction, { embeds: [createTokenRequestEmbed()], components: [row], flags: 64 });
+      }
+      await interaction.deferReply({ flags: 64 });
+      await handleVhCommand(interaction, existingToken);
+      return;
+    }
+
+    if (commandName === "kick") {
+      if (!member.permissions.has(PermissionsBitField.Flags.KickMembers))
+        return safeReply(interaction, { content: "Bạn không có quyền kick!", flags: 64 });
+      const target = interaction.options.getMember("user");
+      const reason = interaction.options.getString("reason") || "Không có lý do";
+      if (!target?.kickable) return safeReply(interaction, { content: "Không thể kick người này!", flags: 64 });
+      await target.kick(reason);
+      await safeReply(interaction, { content: `Đã kick **${target.user.tag}**\nLý do: ${reason}` });
+    }
+
+    else if (commandName === "ban") {
+      if (!member.permissions.has(PermissionsBitField.Flags.BanMembers))
+        return safeReply(interaction, { content: "Bạn không có quyền ban!", flags: 64 });
+      const target = interaction.options.getMember("user");
+      const reason = interaction.options.getString("reason") || "Không có lý do";
+      if (!target?.bannable) return safeReply(interaction, { content: "Không thể ban người này!", flags: 64 });
+      await target.ban({ reason });
+      await safeReply(interaction, { content: `Đã ban **${target.user.tag}**\nLý do: ${reason}` });
+    }
+
+    else if (commandName === "unban") {
+      if (!member.permissions.has(PermissionsBitField.Flags.BanMembers))
+        return safeReply(interaction, { content: "Bạn không có quyền unban!", flags: 64 });
+      const uid = interaction.options.getString("userid");
+      try {
+        await guild.members.unban(uid);
+        await safeReply(interaction, { content: `Đã gỡ ban cho ID: \`${uid}\`` });
+      } catch {
+        await safeReply(interaction, { content: "Không tìm thấy user trong danh sách ban!", flags: 64 });
+      }
+    }
+
+    else if (commandName === "mute") {
+      if (!member.permissions.has(PermissionsBitField.Flags.ModerateMembers))
+        return safeReply(interaction, { content: "Bạn không có quyền mute!", flags: 64 });
+      const target   = interaction.options.getMember("user");
+      const duration = interaction.options.getInteger("duration");
+      const reason   = interaction.options.getString("reason") || "Không có lý do";
+      if (!target?.moderatable) return safeReply(interaction, { content: "Không thể mute người này!", flags: 64 });
+      await target.timeout(duration * 60 * 1000, reason);
+      await safeReply(interaction, { content: `Đã mute **${target.user.tag}** trong ${duration} phút\nLý do: ${reason}` });
+    }
+
+    else if (commandName === "unmute") {
+      if (!member.permissions.has(PermissionsBitField.Flags.ModerateMembers))
+        return safeReply(interaction, { content: "Bạn không có quyền unmute!", flags: 64 });
+      const target = interaction.options.getMember("user");
+      if (!target?.moderatable) return safeReply(interaction, { content: "Không thể unmute người này!", flags: 64 });
+      await target.timeout(null);
+      await safeReply(interaction, { content: `Đã gỡ mute cho **${target.user.tag}**` });
+    }
+
+    else if (commandName === "warn") {
+      if (!member.permissions.has(PermissionsBitField.Flags.ModerateMembers))
+        return safeReply(interaction, { content: "Bạn không có quyền cảnh cáo!", flags: 64 });
+      const targetUser = interaction.options.getUser("user");
+      const reason     = interaction.options.getString("reason");
+      const warns      = loadJSON(WARN_FILE);
+      if (!warns[targetUser.id]) warns[targetUser.id] = [];
+      warns[targetUser.id].push({ reason, moderator: user.tag, timestamp: Date.now() });
+      saveJSON(WARN_FILE, warns);
+      await safeReply(interaction, { content: `Đã cảnh cáo **${targetUser.tag}**\nLý do: ${reason}\nTổng warns: **${warns[targetUser.id].length}**` });
+    }
+
+    else if (commandName === "warnings") {
+      const targetUser = interaction.options.getUser("user");
+      const warns      = loadJSON(WARN_FILE);
+      const userWarns  = warns[targetUser.id];
+      if (!userWarns?.length)
+        return safeReply(interaction, { content: `**${targetUser.tag}** chưa có cảnh cáo nào!`, flags: 64 });
+      const list = userWarns
+        .map((w, i) => `**${i + 1}.** ${w.reason}\n   Bởi: ${w.moderator} — ${new Date(w.timestamp).toLocaleString("vi-VN")}`)
+        .join("\n\n");
+      await safeReply(interaction, {
+        embeds: [new EmbedBuilder().setColor(0xffff00).setTitle(`Cảnh cáo của ${targetUser.tag}`).setDescription(list).setFooter({ text: `Tổng: ${userWarns.length} warns` })],
+      });
+    }
+
+    else if (commandName === "clearwarns") {
+      if (!member.permissions.has(PermissionsBitField.Flags.Administrator))
+        return safeReply(interaction, { content: "Bạn không có quyền xóa warns!", flags: 64 });
+      const targetUser = interaction.options.getUser("user");
+      const warns      = loadJSON(WARN_FILE);
+      delete warns[targetUser.id];
+      saveJSON(WARN_FILE, warns);
+      await safeReply(interaction, { content: `Đã xóa tất cả cảnh cáo của **${targetUser.tag}**` });
+    }
+
+    else if (commandName === "clear") {
+      if (!member.permissions.has(PermissionsBitField.Flags.ManageMessages))
+        return safeReply(interaction, { content: "Bạn không có quyền xóa tin nhắn!", flags: 64 });
+      const amount = interaction.options.getInteger("amount");
+      try {
+        const deleted = await channel.bulkDelete(amount, true);
+        await safeReply(interaction, { content: `Đã xóa **${deleted.size}** tin nhắn!`, flags: 64 });
+      } catch {
+        await safeReply(interaction, { content: "Không thể xóa tin nhắn (quá cũ hoặc lỗi quyền)!", flags: 64 });
+      }
+    }
+
+    else if (commandName === "avatar") {
+      const targetUser = interaction.options.getUser("user") || user;
+      await safeReply(interaction, {
+        embeds: [new EmbedBuilder().setColor(0x0099ff).setTitle(`Avatar của ${targetUser.tag}`).setImage(targetUser.displayAvatarURL({ dynamic: true, size: 1024 }))],
+      });
+    }
+
+    else if (commandName === "serverinfo") {
+      await safeReply(interaction, {
+        embeds: [
+          new EmbedBuilder()
+            .setColor(0x0099ff)
+            .setTitle(guild.name)
+            .setThumbnail(guild.iconURL({ dynamic: true }))
+            .addFields(
+              { name: "Owner",       value: `<@${guild.ownerId}>`,   inline: true },
+              { name: "Thành viên",  value: `${guild.memberCount}`,  inline: true },
+              { name: "Ngày tạo",    value: `<t:${Math.floor(guild.createdTimestamp / 1000)}:R>`, inline: true },
+              { name: "Boost Level", value: `${guild.premiumTier}`,  inline: true },
+              { name: "Số Boost",    value: `${guild.premiumSubscriptionCount || 0}`, inline: true },
+              { name: "Roles",       value: `${guild.roles.cache.size}`, inline: true }
+            )
+            .setFooter({ text: `Server ID: ${guild.id}` })
+            .setTimestamp(),
+        ],
+      });
+    }
+
+    else if (commandName === "userinfo") {
+      const targetUser   = interaction.options.getUser("user") || user;
+      const targetMember = await guild.members.fetch(targetUser.id).catch(() => null);
+      if (!targetMember) return safeReply(interaction, { content: "Không tìm thấy thành viên này!", flags: 64 });
+
+      const roles = targetMember.roles.cache
+        .filter((r) => r.id !== guild.id)
+        .sort((a, b) => b.position - a.position)
+        .map((r) => `<@&${r.id}>`);
+      let rolesDisplay = roles.join(", ") || "Không có role";
+      if (rolesDisplay.length > 1024) rolesDisplay = roles.slice(0, 5).join(", ") + ` và ${roles.length - 5} role khác...`;
+
+      await safeReply(interaction, {
+        embeds: [
+          new EmbedBuilder()
+            .setColor(0x0099ff)
+            .setTitle(targetUser.tag)
+            .setThumbnail(targetUser.displayAvatarURL({ dynamic: true }))
+            .addFields(
+              { name: "ID",         value: targetUser.id,           inline: true },
+              { name: "Nickname",   value: targetMember.nickname || "Không có", inline: true },
+              { name: "Bot",        value: targetUser.bot ? "Có" : "Không", inline: true },
+              { name: "Tạo lúc",    value: `<t:${Math.floor(targetUser.createdTimestamp / 1000)}:R>`, inline: true },
+              { name: "Vào server", value: `<t:${Math.floor(targetMember.joinedTimestamp / 1000)}:R>`, inline: true },
+              { name: "Roles",      value: rolesDisplay, inline: false }
+            )
+            .setFooter({ text: `User ID: ${targetUser.id}` })
+            .setTimestamp(),
+        ],
+      });
+    }
+
+    else if (commandName === "8ball") {
+      const question = interaction.options.getString("question");
+      const answers  = [
+        "Chắc chắn rồi!", "Không có nghi ngờ gì!", "Có thể lắm!",
+        "Có vẻ tốt đấy!", "Hỏi lại sau nhé!", "Khó nói...",
+        "Không chắc lắm...", "Đừng mơ!", "Không đời nào!",
+      ];
+      await safeReply(interaction, {
+        embeds: [
+          new EmbedBuilder()
+            .setColor(0x0099ff)
+            .setTitle("Magic 8-Ball")
+            .addFields(
+              { name: "Câu hỏi", value: question },
+              { name: "Trả lời", value: answers[Math.floor(Math.random() * answers.length)] }
+            ),
+        ],
+      });
+    }
+
+    else if (commandName === "coinflip") {
+      await safeReply(interaction, { content: `Kết quả: **${Math.random() < 0.5 ? "Ngửa" : "Sấp"}**` });
+    }
+
+    else if (commandName === "roll") {
+      const sides  = interaction.options.getInteger("sides") || 6;
+      const result = Math.floor(Math.random() * sides) + 1;
+      await safeReply(interaction, { content: `Bạn gieo được: **${result}** / ${sides}` });
+    }
+
+    else if (commandName === "say") {
+      const message = interaction.options.getString("message");
+      await safeReply(interaction, { content: "Đã gửi!", flags: 64 });
+      await channel.send(message);
+    }
+
+    else if (commandName === "poll") {
+      const question = interaction.options.getString("question");
+      const options  = [
+        interaction.options.getString("option1"),
+        interaction.options.getString("option2"),
+        interaction.options.getString("option3"),
+        interaction.options.getString("option4"),
+      ].filter(Boolean);
+      const emojis  = ["1️⃣", "2️⃣", "3️⃣", "4️⃣"];
+      const pollMsg = await channel.send({
+        embeds: [
+          new EmbedBuilder()
+            .setColor(0x0099ff)
+            .setTitle("Bình chọn")
+            .setDescription(`**${question}**\n\n${options.map((o, i) => `${emojis[i]} ${o}`).join("\n")}`)
+            .setFooter({ text: `Tạo bởi ${user.tag}` })
+            .setTimestamp(),
+        ],
+      });
+      for (let i = 0; i < options.length; i++) await pollMsg.react(emojis[i]);
+      await safeReply(interaction, { content: "Đã tạo bình chọn!", flags: 64 });
+    }
+
+    else if (commandName === "getadmin") {
+      await safeReply(interaction, {
+        content: member.roles.cache.has(ADMIN_ROLE_ID) ? "Bạn đã được cấp quyền admin!" : "con cac du ma may",
+      });
+    }
+
+    else if (commandName === "ping") {
+      await interaction.reply({ content: "Đang ping..." });
+      const ping = client.ws.ping;
+      await interaction.editReply({
+        content: null,
+        embeds: [
+          new EmbedBuilder()
+            .setColor(ping < 100 ? 0x00ff00 : ping < 200 ? 0xffff00 : 0xff0000)
+            .setTitle("Pong!")
+            .addFields({ name: "API Ping", value: `${Math.round(ping)}ms`, inline: true }),
+        ],
+      });
+    }
+
+    else if (commandName === "help") {
+      await safeReply(interaction, {
+        embeds: [
+          new EmbedBuilder()
+            .setColor(0x0099ff)
+            .setTitle("Hướng dẫn Bot")
+            .addFields(
+              { name: "Moderation", value: "`/kick` `/ban` `/unban` `/mute` `/unmute` `/warn` `/warnings` `/clearwarns` `/clear`" },
+              { name: "Fun & Info", value: "`/avatar` `/serverinfo` `/userinfo` `/8ball` `/coinflip` `/roll` `/say` `/poll`" },
+              { name: "AI",         value: "`/vh` — Việt hóa file config Minecraft (cần Gemini API Key)" },
+              { name: "Tiện ích",   value: "`/ping` `/help`" }
+            )
+            .setFooter({ text: "Dùng / để gõ lệnh" })
+            .setTimestamp(),
+        ],
+      });
+    }
+
+  } catch (error) {
+    console.error(`[ERROR] /${commandName}:`, error);
+    await safeReply(interaction, { content: "Có lỗi xảy ra khi thực hiện lệnh!", flags: 64 });
+  }
+});
+
+/* ---- MESSAGE — nhận token qua DM ---- */
+client.on("messageCreate", async (msg) => {
+  if (msg.author.bot) return;
+
+  if (!msg.guild) {
+    const pending = awaitingToken.get(msg.author.id);
+    if (pending) {
+      const apiKey = msg.content.trim();
+      clearTimeout(pending.timeout);
+      awaitingToken.delete(msg.author.id);
+      userTokens.set(msg.author.id, apiKey);
+      await msg.reply({
+        embeds: [
+          new EmbedBuilder()
+            .setColor(COLORS.SUCCESS)
+            .setTitle("Token Đã Được Lưu!")
+            .setDescription("API Key của bạn đã được lưu thành công!\nQuay lại server và dùng lệnh `/vh` ngay!")
+            .setTimestamp(),
+        ],
+      });
+    }
+    return;
+  }
+
+  console.log(`[${msg.guild.name}] ${msg.author.tag}: ${msg.content}`);
+});
+
+/* ---- READY ---- */
+client.once("ready", async () => {
+  console.log(`BOT ONLINE — ${client.user.tag}`);
+  console.log(`Owner IDs (${OWNER_IDS.length}): ${OWNER_IDS.join(", ")}`);
+  client.user.setActivity("/help để xem lệnh", { type: ActivityType.Playing });
+
+  const commands = [
+    new SlashCommandBuilder().setName("vh").setDescription("Việt hóa file config plugin Minecraft")
+      .addAttachmentOption(o => o.setName("file").setDescription("File cần việt hóa (.txt, .json, .yml, ...)").setRequired(true)),
+    new SlashCommandBuilder().setName("kick").setDescription("Kick một thành viên")
+      .addUserOption(o => o.setName("user").setDescription("Người cần kick").setRequired(true))
+      .addStringOption(o => o.setName("reason").setDescription("Lý do")),
+    new SlashCommandBuilder().setName("ban").setDescription("Ban một thành viên")
+      .addUserOption(o => o.setName("user").setDescription("Người cần ban").setRequired(true))
+      .addStringOption(o => o.setName("reason").setDescription("Lý do")),
+    new SlashCommandBuilder().setName("unban").setDescription("Gỡ ban")
+      .addStringOption(o => o.setName("userid").setDescription("ID người cần unban").setRequired(true)),
+    new SlashCommandBuilder().setName("mute").setDescription("Mute thành viên")
+      .addUserOption(o => o.setName("user").setDescription("Người cần mute").setRequired(true))
+      .addIntegerOption(o => o.setName("duration").setDescription("Thời gian (phút)").setRequired(true).setMinValue(1).setMaxValue(40320))
+      .addStringOption(o => o.setName("reason").setDescription("Lý do")),
+    new SlashCommandBuilder().setName("unmute").setDescription("Gỡ mute")
+      .addUserOption(o => o.setName("user").setDescription("Người cần gỡ mute").setRequired(true)),
+    new SlashCommandBuilder().setName("warn").setDescription("Cảnh cáo thành viên")
+      .addUserOption(o => o.setName("user").setDescription("Người cần cảnh cáo").setRequired(true))
+      .addStringOption(o => o.setName("reason").setDescription("Lý do").setRequired(true)),
+    new SlashCommandBuilder().setName("warnings").setDescription("Xem danh sách warns")
+      .addUserOption(o => o.setName("user").setDescription("Người cần xem").setRequired(true)),
+    new SlashCommandBuilder().setName("clearwarns").setDescription("Xóa tất cả warns")
+      .addUserOption(o => o.setName("user").setDescription("Người cần xóa warns").setRequired(true)),
+    new SlashCommandBuilder().setName("clear").setDescription("Xóa tin nhắn")
+      .addIntegerOption(o => o.setName("amount").setDescription("Số tin nhắn (1-100)").setRequired(true).setMinValue(1).setMaxValue(100)),
+    new SlashCommandBuilder().setName("avatar").setDescription("Xem avatar")
+      .addUserOption(o => o.setName("user").setDescription("Người cần xem")),
+    new SlashCommandBuilder().setName("serverinfo").setDescription("Thông tin server"),
+    new SlashCommandBuilder().setName("userinfo").setDescription("Thông tin user")
+      .addUserOption(o => o.setName("user").setDescription("Người cần xem")),
+    new SlashCommandBuilder().setName("8ball").setDescription("Magic 8-Ball")
+      .addStringOption(o => o.setName("question").setDescription("Câu hỏi").setRequired(true)),
+    new SlashCommandBuilder().setName("coinflip").setDescription("Tung đồng xu"),
+    new SlashCommandBuilder().setName("roll").setDescription("Gieo xúc xắc")
+      .addIntegerOption(o => o.setName("sides").setDescription("Số mặt").setMinValue(2).setMaxValue(100)),
+    new SlashCommandBuilder().setName("say").setDescription("Bot nói")
+      .addStringOption(o => o.setName("message").setDescription("Tin nhắn").setRequired(true)),
+    new SlashCommandBuilder().setName("poll").setDescription("Tạo bình chọn")
+      .addStringOption(o => o.setName("question").setDescription("Câu hỏi").setRequired(true))
+      .addStringOption(o => o.setName("option1").setDescription("Lựa chọn 1").setRequired(true))
+      .addStringOption(o => o.setName("option2").setDescription("Lựa chọn 2").setRequired(true))
+      .addStringOption(o => o.setName("option3").setDescription("Lựa chọn 3"))
+      .addStringOption(o => o.setName("option4").setDescription("Lựa chọn 4")),
+    new SlashCommandBuilder().setName("getadmin").setDescription("Yêu cầu quyền admin"),
+    new SlashCommandBuilder().setName("ping").setDescription("Kiểm tra ping"),
+    new SlashCommandBuilder().setName("help").setDescription("Xem hướng dẫn"),
+  ];
+
+  try {
+    const rest = new REST({ version: "10" }).setToken(TOKEN);
+    await rest.put(Routes.applicationGuildCommands(CLIENT_ID, GUILD_ID), { body: commands });
+    console.log("Đã đăng ký slash commands!");
+  } catch (err) {
+    console.error("Lỗi đăng ký commands:", err);
+  }
+});
+
+process.on("unhandledRejection", (err) => console.error("[unhandledRejection]", err));
+process.on("uncaughtException",  (err) => console.error("[uncaughtException]", err));
+
+client.login(TOKEN);
