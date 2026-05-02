@@ -12,22 +12,22 @@ import {
   ActionRowBuilder,
   AttachmentBuilder,
   Partials,
+  ChannelType,
 } from "discord.js";
+import {
+  joinVoiceChannel,
+  createAudioPlayer,
+  createAudioResource,
+  AudioPlayerStatus,
+  getVoiceConnection,
+} from "@discordjs/voice";
 import fs from "fs";
+import path from "path";
 import dotenv from "dotenv";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
 dotenv.config();
 
-/*
-  CONFIG — file .env cần có:
-    TOKEN=your_bot_token_here
-    CLIENT_ID=your_client_id
-    GUILD_ID=your_guild_id
-    ADMIN_ROLE_ID=your_admin_role_id
-    OWNER_USER_IDS=id1,id2,id3
-    WELCOME_CHANNEL_ID=channel_id_welcome
-    GOODBYE_CHANNEL_ID=channel_id_goodbye
-*/
 const TOKEN              = process.env.TOKEN;
 const CLIENT_ID          = process.env.CLIENT_ID;
 const GUILD_ID           = process.env.GUILD_ID;
@@ -41,9 +41,23 @@ const OWNER_IDS = process.env.OWNER_USER_IDS
 
 const WARN_FILE    = "./warns.json";
 const ALLOWED_FILE = "./allowed_guilds.json";
+const ECONOMY_FILE = "./economy.json";
 
 const WELCOME_GIF = "https://media1.tenor.com/m/2NroV6Irul0AAAAd/mixigaming.gif";
 const GOODBYE_GIF = "https://media1.tenor.com/m/bmfPgjAQ5ucAAAAd/doakes-doakes-sad.gif";
+
+const DAILY_REWARD   = 20000;
+const DAILY_COOLDOWN = 24 * 60 * 60 * 1000;
+const MIN_BET        = 2000;
+const MAX_BET        = 1000000000;
+const WIN_MULTIPLIER = 1.95;
+
+// Đặt file âm thanh vào thư mục ./sounds/
+const SOUNDS = {
+  red:    { label: "Red",    file: "./sounds/chui.mp3" },
+  green:  { label: "Green",  file: "./sounds/chui2.mp3" },
+  yellow: { label: "Yellow", file: "./sounds/yellow.mp3" },
+};
 
 if (!TOKEN) {
   console.error("[FATAL] TOKEN chưa được đặt trong .env!");
@@ -69,6 +83,7 @@ const client = new Client({
 const pendingGuilds = new Map();
 const userTokens    = new Map();
 const awaitingToken = new Map();
+const pendingSound  = new Map();
 
 const COLORS = {
   INFO:    "#3498db",
@@ -77,9 +92,10 @@ const COLORS = {
   ERROR:   "#e74c3c",
   WELCOME: "#57F287",
   GOODBYE: "#ED4245",
+  GOLD:    "#FFD700",
+  DICE:    "#9B59B6",
 };
 
-/* ---- FILE I/O ---- */
 const loadJSON = (file) => {
   try {
     if (!fs.existsSync(file)) { fs.writeFileSync(file, "{}", "utf-8"); return {}; }
@@ -96,7 +112,6 @@ const saveJSON = (file, data) => {
   catch (err) { console.error(`[JSON] Lỗi ghi ${file}:`, err.message); }
 };
 
-/* ---- HELPERS ---- */
 const safeReply = async (interaction, options) => {
   try {
     if (interaction.replied || interaction.deferred) return await interaction.editReply(options);
@@ -115,7 +130,41 @@ const safeLeave = async (guild, reason = "") => {
   }
 };
 
-/* ---- EMBED BUILDERS ---- */
+function getEconomyData(userId) {
+  const economy = loadJSON(ECONOMY_FILE);
+  if (!economy[userId]) {
+    economy[userId] = { balance: 0, lastDaily: 0, totalWon: 0, totalLost: 0, gamesPlayed: 0 };
+    saveJSON(ECONOMY_FILE, economy);
+  }
+  return economy[userId];
+}
+
+function updateEconomyData(userId, newData) {
+  const economy = loadJSON(ECONOMY_FILE);
+  economy[userId] = { ...getEconomyData(userId), ...newData };
+  saveJSON(ECONOMY_FILE, economy);
+}
+
+function formatCoins(amount) {
+  return amount.toLocaleString("vi-VN") + " VNĐ";
+}
+
+function rollDice() {
+  const dice = [
+    Math.floor(Math.random() * 6) + 1,
+    Math.floor(Math.random() * 6) + 1,
+    Math.floor(Math.random() * 6) + 1,
+  ];
+  const total  = dice[0] + dice[1] + dice[2];
+  const result = total >= 11 ? "tài" : "xỉu";
+  return { dice, total, result };
+}
+
+function diceEmoji(value) {
+  const faces = ["", "⚀", "⚁", "⚂", "⚃", "⚄", "⚅"];
+  return faces[value] || "?";
+}
+
 function createEmbed(title, description, color, author = null, fields = []) {
   const embed = new EmbedBuilder()
     .setTitle(title)
@@ -171,7 +220,7 @@ function createWelcomeEmbed(member) {
     .setThumbnail(member.user.displayAvatarURL({ dynamic: true, size: 256 }))
     .setImage(WELCOME_GIF)
     .addFields(
-      { name: "Thành viên thứ",   value: `${member.guild.memberCount}`, inline: true },
+      { name: "Thành viên thứ",    value: `${member.guild.memberCount}`, inline: true },
       { name: "Tài khoản tạo lúc", value: `<t:${Math.floor(member.user.createdTimestamp / 1000)}:R>`, inline: true }
     )
     .setFooter({ text: `ID: ${member.id}` })
@@ -189,19 +238,574 @@ function createGoodbyeEmbed(member) {
     .setThumbnail(member.user.displayAvatarURL({ dynamic: true, size: 256 }))
     .setImage(GOODBYE_GIF)
     .addFields(
-      { name: "Còn lại",  value: `${member.guild.memberCount} thành viên`, inline: true },
+      { name: "Còn lại",    value: `${member.guild.memberCount} thành viên`, inline: true },
       { name: "Đã vào lúc", value: member.joinedTimestamp ? `<t:${Math.floor(member.joinedTimestamp / 1000)}:R>` : "Không rõ", inline: true }
     )
     .setFooter({ text: `ID: ${member.id}` })
     .setTimestamp();
 }
 
+async function vietnameseTranslation(content, fileExtension, model) {
+  let prompt = "";
+  switch (fileExtension) {
+    case ".json":
+      prompt = `Hãy dịch file JSON này từ tiếng Anh sang tiếng Việt. Chỉ dịch các giá trị văn bản, không dịch keys, mã code, biến, đường dẫn. Giữ nguyên cấu trúc JSON. Nội dung:\n${content}`;
+      break;
+    case ".yml":
+    case ".yaml":
+      prompt = `Hãy dịch file YAML này từ tiếng Anh sang tiếng Việt. Chỉ dịch giá trị văn bản, không dịch keys, mã code, biến. Giữ nguyên cấu trúc YAML. Nội dung:\n${content}`;
+      break;
+    case ".properties":
+      prompt = `Hãy dịch file properties từ tiếng Anh sang tiếng Việt. Chỉ dịch phần giá trị sau dấu =, không dịch keys. Nội dung:\n${content}`;
+      break;
+    default:
+      prompt = `Hãy dịch file này từ tiếng Anh sang tiếng Việt. Không dịch mã code, tên hàm, biến, đường dẫn. Nội dung:\n${content}`;
+  }
+  const result = await model.generateContent(prompt);
+  return result.response.text();
+}
 
-/* ================================================================= */
-/*  EVENTS                                                            */
-/* ================================================================= */
+async function handleVhCommand(interaction, apiKey) {
+  try {
+    const fileAttachment      = interaction.options.getAttachment("file");
+    const fileExtension       = fileAttachment.name.slice(fileAttachment.name.lastIndexOf(".")).toLowerCase();
+    const supportedExtensions = [".txt", ".json", ".yml", ".yaml", ".properties", ".conf"];
 
-/* ---- WELCOME + ANTI-CLONE ---- */
+    if (!supportedExtensions.includes(fileExtension)) {
+      return interaction.editReply({
+        embeds: [createEmbed("Định Dạng Không Hỗ Trợ", "Chỉ hỗ trợ: `.txt` `.json` `.yml` `.yaml` `.properties` `.conf`", COLORS.ERROR)],
+      });
+    }
+
+    const response    = await fetch(fileAttachment.url);
+    const fileContent = await response.text();
+
+    await interaction.editReply({ embeds: [createProcessingEmbed(fileAttachment.name, 0)] });
+
+    let step = 0;
+    const updateInterval = setInterval(async () => {
+      step = (step + 1) % 4;
+      try { await interaction.editReply({ embeds: [createProcessingEmbed(fileAttachment.name, step)] }); }
+      catch { /* ignore */ }
+    }, 3000);
+
+    const userGenAI  = new GoogleGenerativeAI(apiKey);
+    const model      = userGenAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+    const translated = await vietnameseTranslation(fileContent, fileExtension, model);
+
+    clearInterval(updateInterval);
+
+    const tempDir  = "./temp";
+    const tempPath = `${tempDir}/VH_${fileAttachment.name}`;
+    if (!fs.existsSync(tempDir)) fs.mkdirSync(tempDir, { recursive: true });
+    fs.writeFileSync(tempPath, translated, "utf-8");
+
+    const attachment = new AttachmentBuilder(tempPath, { name: `VH_${fileAttachment.name}` });
+
+    try {
+      await interaction.user.send({
+        embeds: [
+          createEmbed(
+            "Việt Hóa Hoàn Tất!",
+            `File \`${fileAttachment.name}\` đã được việt hóa thành công!\nFile đính kèm bên dưới là phiên bản Tiếng Việt.`,
+            COLORS.SUCCESS,
+            { name: interaction.user.username, iconURL: interaction.user.displayAvatarURL() },
+            [
+              { name: "File Gốc",      value: fileAttachment.name,         inline: true },
+              { name: "File Việt Hóa", value: `VH_${fileAttachment.name}`, inline: true },
+              { name: "Định Dạng",     value: fileExtension,               inline: true },
+            ]
+          ),
+        ],
+        files: [attachment],
+      });
+      await interaction.editReply({
+        embeds: [createEmbed("Hoàn Tất!", "File đã được gửi vào **tin nhắn riêng** của bạn!", COLORS.SUCCESS)],
+      });
+    } catch {
+      await interaction.editReply({
+        embeds: [createEmbed("Không Thể Gửi DM", "Hãy bật **Cho phép tin nhắn riêng** từ thành viên server trong cài đặt Discord!", COLORS.WARNING)],
+      });
+    }
+
+    try { fs.unlinkSync(tempPath); } catch { /* ignore */ }
+
+  } catch (error) {
+    console.error("[VH] Lỗi:", error.message);
+    await interaction.editReply({
+      embeds: [createEmbed("Đã Xảy Ra Lỗi", "Vui lòng thử lại hoặc kiểm tra lại API Key Gemini!", COLORS.ERROR)],
+    });
+  }
+}
+
+async function handleDaily(interaction) {
+  const userId  = interaction.user.id;
+  const data    = getEconomyData(userId);
+  const now     = Date.now();
+  const elapsed = now - data.lastDaily;
+
+  if (elapsed < DAILY_COOLDOWN) {
+    const remaining = DAILY_COOLDOWN - elapsed;
+    const hours     = Math.floor(remaining / 3600000);
+    const minutes   = Math.floor((remaining % 3600000) / 60000);
+    const seconds   = Math.floor((remaining % 60000) / 1000);
+
+    return safeReply(interaction, {
+      embeds: [
+        new EmbedBuilder()
+          .setColor(COLORS.WARNING)
+          .setTitle("Hãy Đợi Thêm Chút Nữa!")
+          .setDescription(
+            `Bạn đã nhận xu hôm nay rồi!\n\n` +
+            `Còn lại: **${hours}h ${minutes}m ${seconds}s** nữa để nhận tiếp.`
+          )
+          .addFields({ name: "Số Dư Hiện Tại", value: formatCoins(data.balance), inline: true })
+          .setFooter({ text: `Nhận ${DAILY_REWARD} xu mỗi 24 giờ!` })
+          .setTimestamp(),
+      ],
+      flags: 64,
+    });
+  }
+
+  const newBalance = data.balance + DAILY_REWARD;
+  updateEconomyData(userId, { balance: newBalance, lastDaily: now });
+
+  return safeReply(interaction, {
+    embeds: [
+      new EmbedBuilder()
+        .setColor(COLORS.GOLD)
+        .setTitle("Nhận Xu Hàng Ngày!")
+        .setDescription(
+          `Chúc mừng <@${userId}>!\n` +
+          `Bạn đã nhận được **${formatCoins(DAILY_REWARD)}** hôm nay!`
+        )
+        .addFields(
+          { name: "Số Dư Mới", value: formatCoins(newBalance),   inline: true },
+          { name: "Nhận Được", value: formatCoins(DAILY_REWARD), inline: true }
+        )
+        .setThumbnail(interaction.user.displayAvatarURL({ dynamic: true }))
+        .setFooter({ text: "Quay lại sau 24 giờ để nhận tiếp!" })
+        .setTimestamp(),
+    ],
+  });
+}
+
+async function handleBalance(interaction) {
+  const targetUser = interaction.options.getUser("user") || interaction.user;
+  const data       = getEconomyData(targetUser.id);
+
+  const winRate = data.gamesPlayed > 0
+    ? ((data.totalWon / (data.totalWon + data.totalLost)) * 100).toFixed(1)
+    : "0.0";
+
+  return safeReply(interaction, {
+    embeds: [
+      new EmbedBuilder()
+        .setColor(COLORS.GOLD)
+        .setTitle(`Ví Của ${targetUser.username}`)
+        .setThumbnail(targetUser.displayAvatarURL({ dynamic: true }))
+        .addFields(
+          { name: "Số Dư",       value: formatCoins(data.balance),   inline: true },
+          { name: "Số Ván",      value: `${data.gamesPlayed} ván`,   inline: true },
+          { name: "Tỉ Lệ Thắng", value: `${winRate}%`,               inline: true },
+          { name: "Tổng Thắng",  value: formatCoins(data.totalWon),  inline: true },
+          { name: "Tổng Thua",   value: formatCoins(data.totalLost), inline: true },
+        )
+        .setFooter({ text: `Dùng /daily để nhận ${DAILY_REWARD} xu mỗi ngày!` })
+        .setTimestamp(),
+    ],
+  });
+}
+
+async function handleTaixiu(interaction) {
+  const userId = interaction.user.id;
+  const choice = interaction.options.getString("choice");
+  const bet    = interaction.options.getInteger("bet");
+  const data   = getEconomyData(userId);
+
+  if (data.balance <= 0) {
+    return safeReply(interaction, {
+      embeds: [
+        new EmbedBuilder()
+          .setColor(COLORS.ERROR)
+          .setTitle("Không Đủ Xu!")
+          .setDescription(`Bạn không có xu để cược!\nDùng **/daily** để nhận **${formatCoins(DAILY_REWARD)}** miễn phí mỗi ngày.`)
+          .setTimestamp(),
+      ],
+      flags: 64,
+    });
+  }
+
+  if (bet < MIN_BET || bet > MAX_BET) {
+    return safeReply(interaction, {
+      embeds: [
+        new EmbedBuilder()
+          .setColor(COLORS.ERROR)
+          .setTitle("Mức Cược Không Hợp Lệ!")
+          .setDescription(`Mức cược phải từ **${formatCoins(MIN_BET)}** đến **${formatCoins(MAX_BET)}**.`)
+          .setTimestamp(),
+      ],
+      flags: 64,
+    });
+  }
+
+  if (bet > data.balance) {
+    return safeReply(interaction, {
+      embeds: [
+        new EmbedBuilder()
+          .setColor(COLORS.ERROR)
+          .setTitle("Không Đủ Xu!")
+          .setDescription(
+            `Bạn chỉ có **${formatCoins(data.balance)}** nhưng muốn cược **${formatCoins(bet)}**.\n` +
+            `Dùng **/daily** để nhận thêm xu!`
+          )
+          .setTimestamp(),
+      ],
+      flags: 64,
+    });
+  }
+
+  await interaction.deferReply();
+
+  const TOTAL_SECS = 10;
+  const BAR_LEN    = 10;
+
+  const buildShakeEmbed = (elapsed) => {
+    const bar       = "▓".repeat(elapsed) + "░".repeat(BAR_LEN - elapsed);
+    const remaining = TOTAL_SECS - elapsed;
+    const desc = remaining > 0
+      ? `<@${userId}> cược **${formatCoins(bet)}** vào **${choice.toUpperCase()}**\n\n\`[${bar}]\` **${remaining}s**`
+      : `<@${userId}> cược **${formatCoins(bet)}** vào **${choice.toUpperCase()}**\n\n\`[${bar}]\``;
+    return new EmbedBuilder()
+      .setColor(COLORS.DICE)
+      .setTitle("Tài Xỉu")
+      .setDescription(desc)
+      .setTimestamp();
+  };
+
+  await interaction.editReply({ embeds: [buildShakeEmbed(0)] });
+
+  for (let i = 1; i <= TOTAL_SECS; i++) {
+    await new Promise((r) => setTimeout(r, 1000));
+    try { await interaction.editReply({ embeds: [buildShakeEmbed(i)] }); }
+    catch { /* ignore */ }
+  }
+
+  const { dice, total, result } = rollDice();
+  const isWin  = result === choice;
+  const winAmt = Math.floor(bet * WIN_MULTIPLIER);
+  const profit = isWin ? winAmt - bet : -bet;
+  const newBal = isWin ? data.balance + (winAmt - bet) : data.balance - bet;
+
+  updateEconomyData(userId, {
+    balance:     newBal,
+    gamesPlayed: data.gamesPlayed + 1,
+    totalWon:    data.totalWon  + (isWin ? winAmt - bet : 0),
+    totalLost:   data.totalLost + (isWin ? 0 : bet),
+  });
+
+  const row = new ActionRowBuilder().addComponents(
+    new ButtonBuilder()
+      .setCustomId(`taixiu_retry_tài_${bet}_${userId}`)
+      .setLabel("Cược Tài")
+      .setStyle(ButtonStyle.Primary)
+      .setDisabled(newBal < MIN_BET),
+    new ButtonBuilder()
+      .setCustomId(`taixiu_retry_xỉu_${bet}_${userId}`)
+      .setLabel("Cược Xỉu")
+      .setStyle(ButtonStyle.Secondary)
+      .setDisabled(newBal < MIN_BET),
+  );
+
+  await interaction.editReply({
+    embeds: [
+      new EmbedBuilder()
+        .setColor(isWin ? COLORS.SUCCESS : COLORS.ERROR)
+        .setTitle(isWin ? "THẮNG RỒI!" : "THUA RỒI!")
+        .setDescription(
+          `**${diceEmoji(dice[0])} ${diceEmoji(dice[1])} ${diceEmoji(dice[2])}**\n\n` +
+          `Tổng điểm: **${total}** → Kết quả: **${result.toUpperCase()}**\n\n` +
+          (isWin
+            ? `Bạn đoán đúng **${choice.toUpperCase()}** và thắng **+${formatCoins(winAmt - bet)}**!`
+            : `Bạn đoán **${choice.toUpperCase()}** nhưng ra **${result.toUpperCase()}** và thua **-${formatCoins(bet)}**!`)
+        )
+        .addFields(
+          { name: "Lựa Chọn",  value: choice.toUpperCase(),                           inline: true },
+          { name: "Kết Quả",   value: result.toUpperCase(),                           inline: true },
+          { name: "Mức Cược",  value: formatCoins(bet),                               inline: true },
+          { name: isWin ? "Lợi Nhuận" : "Mất Đi",
+            value: (isWin ? "+" : "-") + formatCoins(Math.abs(profit)),               inline: true },
+          { name: "Số Dư Mới", value: formatCoins(newBal),                            inline: true },
+        )
+        .setThumbnail(interaction.user.displayAvatarURL({ dynamic: true }))
+        .setFooter({ text: newBal <= 0 ? "Hết xu rồi! Dùng /daily để nhận thêm!" : "Dùng /daily nếu cần thêm vốn!" })
+        .setTimestamp(),
+    ],
+    components: [row],
+  });
+}
+
+async function handleLeaderboard(interaction) {
+  const economy = loadJSON(ECONOMY_FILE);
+  const entries = Object.entries(economy)
+    .filter(([, d]) => d.balance > 0)
+    .sort(([, a], [, b]) => b.balance - a.balance)
+    .slice(0, 10);
+
+  if (entries.length === 0) {
+    return safeReply(interaction, {
+      embeds: [
+        new EmbedBuilder()
+          .setColor(COLORS.INFO)
+          .setTitle("Bảng Xếp Hạng Chưa Có Dữ Liệu")
+          .setDescription("Chưa ai chơi tài xỉu hoặc nhận xu daily! Hãy là người đầu tiên với **/daily**.")
+          .setTimestamp(),
+      ],
+    });
+  }
+
+  const medals = ["#1", "#2", "#3", "#4", "#5", "#6", "#7", "#8", "#9", "#10"];
+  const lines  = await Promise.all(
+    entries.map(async ([uid, d], i) => {
+      try {
+        const u = await client.users.fetch(uid);
+        return `${medals[i]} **${u.username}** — ${formatCoins(d.balance)}`;
+      } catch {
+        return `${medals[i]} **ID:${uid}** — ${formatCoins(d.balance)}`;
+      }
+    })
+  );
+
+  return safeReply(interaction, {
+    embeds: [
+      new EmbedBuilder()
+        .setColor(COLORS.GOLD)
+        .setTitle("Bảng Xếp Hạng Xu")
+        .setDescription(lines.join("\n"))
+        .setFooter({ text: "Top 10 người giàu nhất server" })
+        .setTimestamp(),
+    ],
+  });
+}
+
+async function handleSound(interaction) {
+  if (!OWNER_IDS.includes(interaction.user.id)) {
+    return safeReply(interaction, { content: "Bạn không có quyền dùng lệnh này!", flags: 64 });
+  }
+
+  const row = new ActionRowBuilder().addComponents(
+    new ButtonBuilder()
+      .setCustomId(`sound_pick_red_${interaction.user.id}`)
+      .setLabel("Red")
+      .setStyle(ButtonStyle.Danger),
+    new ButtonBuilder()
+      .setCustomId(`sound_pick_green_${interaction.user.id}`)
+      .setLabel("Green")
+      .setStyle(ButtonStyle.Success),
+    new ButtonBuilder()
+      .setCustomId(`sound_pick_yellow_${interaction.user.id}`)
+      .setLabel("Yellow")
+      .setStyle(ButtonStyle.Primary),
+  );
+
+  return safeReply(interaction, {
+    embeds: [
+      new EmbedBuilder()
+        .setColor(COLORS.INFO)
+        .setTitle("Chọn Âm Thanh")
+        .setDescription("Bạn muốn phát âm thanh nào?")
+        .setTimestamp(),
+    ],
+    components: [row],
+    flags: 64,
+  });
+}
+
+async function handleSoundChannelPick(interaction, soundKey, userId) {
+  const guild         = interaction.guild;
+  const voiceChannels = [...guild.channels.cache
+    .filter((c) => c.type === ChannelType.GuildVoice)
+    .sort((a, b) => a.position - b.position)
+    .values()
+  ].slice(0, 5);
+
+  if (voiceChannels.length === 0) {
+    return interaction.update({
+      embeds: [createEmbed("Lỗi", "Không tìm thấy kênh voice nào trong server!", COLORS.ERROR)],
+      components: [],
+    });
+  }
+
+  pendingSound.set(userId, { soundKey });
+
+  const buttons = voiceChannels.map((ch) =>
+    new ButtonBuilder()
+      .setCustomId(`sound_join_${ch.id}_${soundKey}_${userId}`)
+      .setLabel(ch.name.slice(0, 80))
+      .setStyle(ButtonStyle.Secondary)
+  );
+
+  const row = new ActionRowBuilder().addComponents(...buttons);
+
+  return interaction.update({
+    embeds: [
+      new EmbedBuilder()
+        .setColor(COLORS.INFO)
+        .setTitle("Chọn Kênh Voice")
+        .setDescription(`Âm thanh: **${SOUNDS[soundKey].label}**\nChọn kênh voice để phát:`)
+        .setTimestamp(),
+    ],
+    components: [row],
+  });
+}
+
+async function handleSoundJoin(interaction, channelId, soundKey, userId) {
+  if (interaction.user.id !== userId) {
+    return interaction.reply({ content: "Đây không phải nút của bạn!", flags: 64 });
+  }
+
+  const sound = SOUNDS[soundKey];
+  if (!sound) {
+    return interaction.update({ embeds: [createEmbed("Lỗi", "Âm thanh không hợp lệ!", COLORS.ERROR)], components: [] });
+  }
+
+  if (!fs.existsSync(sound.file)) {
+    return interaction.update({
+      embeds: [createEmbed("Lỗi", `Không tìm thấy file âm thanh: \`${sound.file}\`\nHãy đặt file vào thư mục \`./sounds/\``, COLORS.ERROR)],
+      components: [],
+    });
+  }
+
+  const channel = interaction.guild.channels.cache.get(channelId);
+  if (!channel) {
+    return interaction.update({ embeds: [createEmbed("Lỗi", "Kênh voice không tồn tại!", COLORS.ERROR)], components: [] });
+  }
+
+  await interaction.update({
+    embeds: [
+      new EmbedBuilder()
+        .setColor(COLORS.SUCCESS)
+        .setTitle("Đang Phát Âm Thanh")
+        .setDescription(`Âm thanh: **${sound.label}**\nKênh: **${channel.name}**\nBot sẽ tự rời khi phát xong.`)
+        .setTimestamp(),
+    ],
+    components: [],
+  });
+
+  try {
+    const existing = getVoiceConnection(interaction.guild.id);
+    if (existing) existing.destroy();
+
+    const connection = joinVoiceChannel({
+      channelId:      channel.id,
+      guildId:        interaction.guild.id,
+      adapterCreator: interaction.guild.voiceAdapterCreator,
+      selfDeaf:       false,
+    });
+
+    const player   = createAudioPlayer();
+    const resource = createAudioResource(path.resolve(sound.file));
+
+    connection.subscribe(player);
+    player.play(resource);
+
+    player.on(AudioPlayerStatus.Idle, () => {
+      connection.destroy();
+      pendingSound.delete(userId);
+    });
+
+    player.on("error", (err) => {
+      console.error("[SOUND] Lỗi phát âm thanh:", err.message);
+      connection.destroy();
+      pendingSound.delete(userId);
+    });
+
+  } catch (err) {
+    console.error("[SOUND] Lỗi join voice:", err.message);
+    await interaction.followUp({ content: "Không thể vào kênh voice! Kiểm tra quyền bot.", flags: 64 });
+  }
+}
+
+async function playTaixiuDirect(interaction, userId, choice, bet) {
+  const data = getEconomyData(userId);
+
+  const TOTAL_SECS = 10;
+  const BAR_LEN    = 10;
+
+  const buildShakeEmbed = (elapsed) => {
+    const bar       = "▓".repeat(elapsed) + "░".repeat(BAR_LEN - elapsed);
+    const remaining = TOTAL_SECS - elapsed;
+    const desc = remaining > 0
+      ? `<@${userId}> cược **${formatCoins(bet)}** vào **${choice.toUpperCase()}**\n\n\`[${bar}]\` **${remaining}s**`
+      : `<@${userId}> cược **${formatCoins(bet)}** vào **${choice.toUpperCase()}**\n\n\`[${bar}]\``;
+    return new EmbedBuilder()
+      .setColor(COLORS.DICE)
+      .setTitle("Tài Xỉu")
+      .setDescription(desc)
+      .setTimestamp();
+  };
+
+  const shakingMsg = await interaction.followUp({ embeds: [buildShakeEmbed(0)] });
+
+  for (let i = 1; i <= TOTAL_SECS; i++) {
+    await new Promise((r) => setTimeout(r, 1000));
+    try { await shakingMsg.edit({ embeds: [buildShakeEmbed(i)] }); }
+    catch { /* ignore */ }
+  }
+
+  const { dice, total, result } = rollDice();
+  const isWin  = result === choice;
+  const winAmt = Math.floor(bet * WIN_MULTIPLIER);
+  const profit = isWin ? winAmt - bet : -bet;
+  const newBal = isWin ? data.balance + (winAmt - bet) : data.balance - bet;
+
+  updateEconomyData(userId, {
+    balance:     newBal,
+    gamesPlayed: data.gamesPlayed + 1,
+    totalWon:    data.totalWon  + (isWin ? winAmt - bet : 0),
+    totalLost:   data.totalLost + (isWin ? 0 : bet),
+  });
+
+  const row = new ActionRowBuilder().addComponents(
+    new ButtonBuilder()
+      .setCustomId(`taixiu_retry_tài_${bet}_${userId}`)
+      .setLabel("Cược Tài")
+      .setStyle(ButtonStyle.Primary)
+      .setDisabled(newBal < MIN_BET),
+    new ButtonBuilder()
+      .setCustomId(`taixiu_retry_xỉu_${bet}_${userId}`)
+      .setLabel("Cược Xỉu")
+      .setStyle(ButtonStyle.Secondary)
+      .setDisabled(newBal < MIN_BET),
+  );
+
+  await shakingMsg.edit({
+    embeds: [
+      new EmbedBuilder()
+        .setColor(isWin ? COLORS.SUCCESS : COLORS.ERROR)
+        .setTitle(isWin ? "THẮNG RỒI!" : "THUA RỒI!")
+        .setDescription(
+          `**${diceEmoji(dice[0])} ${diceEmoji(dice[1])} ${diceEmoji(dice[2])}**\n\n` +
+          `Tổng điểm: **${total}** → Kết quả: **${result.toUpperCase()}**\n\n` +
+          (isWin
+            ? `Bạn đoán đúng **${choice.toUpperCase()}** và thắng **+${formatCoins(winAmt - bet)}**!`
+            : `Bạn đoán **${choice.toUpperCase()}** nhưng ra **${result.toUpperCase()}** và thua **-${formatCoins(bet)}**!`)
+        )
+        .addFields(
+          { name: "Lựa Chọn",  value: choice.toUpperCase(),                        inline: true },
+          { name: "Kết Quả",   value: result.toUpperCase(),                        inline: true },
+          { name: "Mức Cược",  value: formatCoins(bet),                            inline: true },
+          { name: isWin ? "Lợi Nhuận" : "Mất Đi",
+            value: (isWin ? "+" : "-") + formatCoins(Math.abs(profit)),            inline: true },
+          { name: "Số Dư Mới", value: formatCoins(newBal),                         inline: true },
+        )
+        .setFooter({ text: newBal <= 0 ? "Hết xu rồi! Dùng /daily để nhận thêm!" : "Dùng /daily nếu cần thêm vốn!" })
+        .setTimestamp(),
+    ],
+    components: [row],
+  });
+}
+
 client.on("guildMemberAdd", async (member) => {
   const age = Date.now() - member.user.createdTimestamp;
   if (age < 3 * 24 * 60 * 60 * 1000) {
@@ -223,7 +827,6 @@ client.on("guildMemberAdd", async (member) => {
   }
 });
 
-/* ---- GOODBYE ---- */
 client.on("guildMemberRemove", async (member) => {
   if (!GOODBYE_CHANNEL_ID) return;
   try {
@@ -234,7 +837,6 @@ client.on("guildMemberRemove", async (member) => {
   }
 });
 
-/* ---- ANTI-RAID guildCreate ---- */
 client.on("guildCreate", async (guild) => {
   const allowedGuilds = loadJSON(ALLOWED_FILE);
   if (allowedGuilds[guild.id]) {
@@ -306,15 +908,70 @@ client.on("guildCreate", async (guild) => {
   });
 });
 
-/* ---- INTERACTIONS ---- */
 client.on("interactionCreate", async (interaction) => {
 
   if (interaction.isButton()) {
     const { customId } = interaction;
     const userId       = interaction.user.id;
 
+    if (customId.startsWith("taixiu_retry_")) {
+      const parts   = customId.split("_");
+      const choice  = parts[2];
+      const bet     = parseInt(parts[3]);
+      const ownerId = parts[4];
+
+      if (userId !== ownerId)
+        return interaction.reply({ content: "Đây không phải nút của bạn!", flags: 64 });
+
+      const data = getEconomyData(userId);
+      if (data.balance < MIN_BET) {
+        return interaction.reply({
+          embeds: [
+            new EmbedBuilder()
+              .setColor(COLORS.ERROR)
+              .setTitle("Không Đủ Xu!")
+              .setDescription("Dùng **/daily** để nhận thêm xu!")
+              .setTimestamp(),
+          ],
+          flags: 64,
+        });
+      }
+
+      await interaction.update({ components: [] });
+      await playTaixiuDirect(interaction, userId, choice, Math.min(bet, data.balance));
+      return;
+    }
+
+    if (customId.startsWith("sound_pick_")) {
+      // format: sound_pick_<soundKey>_<userId>
+      const parts    = customId.split("_");
+      const soundKey = parts[2];
+      const ownerId  = parts[3];
+
+      if (userId !== ownerId)
+        return interaction.reply({ content: "Đây không phải nút của bạn!", flags: 64 });
+
+      await handleSoundChannelPick(interaction, soundKey, userId);
+      return;
+    }
+
+    if (customId.startsWith("sound_join_")) {
+      // format: sound_join_<channelId>_<soundKey>_<userId>
+      const withoutPrefix = customId.slice("sound_join_".length);
+      const lastUndersound  = withoutPrefix.lastIndexOf("_");
+      const secondLastUnder = withoutPrefix.lastIndexOf("_", lastUndersound - 1);
+      const channelId = withoutPrefix.slice(0, secondLastUnder);
+      const soundKey  = withoutPrefix.slice(secondLastUnder + 1, lastUndersound);
+      const ownerId   = withoutPrefix.slice(lastUndersound + 1);
+
+      await handleSoundJoin(interaction, channelId, soundKey, ownerId);
+      return;
+    }
+
     if (customId.startsWith("approve_") || customId.startsWith("reject_")) {
-      const [action, guildId] = customId.split("_");
+      const separatorIdx = customId.indexOf("_");
+      const action       = customId.slice(0, separatorIdx);
+      const guildId      = customId.slice(separatorIdx + 1);
 
       if (!OWNER_IDS.includes(userId))
         return interaction.reply({ content: "Bạn không có quyền thực hiện hành động này!", flags: 64 });
@@ -451,6 +1108,12 @@ client.on("interactionCreate", async (interaction) => {
   const { commandName, user, member, channel, guild } = interaction;
 
   try {
+
+    if (commandName === "daily")       return await handleDaily(interaction);
+    if (commandName === "balance")     return await handleBalance(interaction);
+    if (commandName === "taixiu")      return await handleTaixiu(interaction);
+    if (commandName === "leaderboard") return await handleLeaderboard(interaction);
+    if (commandName === "sound")       return await handleSound(interaction);
 
     if (commandName === "vh") {
       const existingToken = userTokens.get(user.id);
@@ -712,10 +1375,12 @@ client.on("interactionCreate", async (interaction) => {
             .setColor(0x0099ff)
             .setTitle("Hướng dẫn Bot")
             .addFields(
-              { name: "Moderation", value: "`/kick` `/ban` `/unban` `/mute` `/unmute` `/warn` `/warnings` `/clearwarns` `/clear`" },
-              { name: "Fun & Info", value: "`/avatar` `/serverinfo` `/userinfo` `/8ball` `/coinflip` `/roll` `/say` `/poll`" },
-              { name: "AI",         value: "`/vh` — Việt hóa file config Minecraft (cần Gemini API Key)" },
-              { name: "Tiện ích",   value: "`/ping` `/help`" }
+              { name: "Moderation",         value: "`/kick` `/ban` `/unban` `/mute` `/unmute` `/warn` `/warnings` `/clearwarns` `/clear`" },
+              { name: "Fun & Info",         value: "`/avatar` `/serverinfo` `/userinfo` `/8ball` `/coinflip` `/roll` `/say` `/poll`" },
+              { name: "AI",                 value: "`/vh` — Việt hóa file config Minecraft (cần Gemini API Key)" },
+              { name: "Tài Xỉu & Kinh Tế", value: "`/daily` `/balance` `/taixiu` `/leaderboard`" },
+              { name: "Voice",              value: "`/sound` — Phát âm thanh vào kênh voice (chỉ owner)" },
+              { name: "Tiện ích",           value: "`/ping` `/help`" }
             )
             .setFooter({ text: "Dùng / để gõ lệnh" })
             .setTimestamp(),
@@ -729,7 +1394,6 @@ client.on("interactionCreate", async (interaction) => {
   }
 });
 
-/* ---- MESSAGE — nhận token qua DM ---- */
 client.on("messageCreate", async (msg) => {
   if (msg.author.bot) return;
 
@@ -756,56 +1420,112 @@ client.on("messageCreate", async (msg) => {
   console.log(`[${msg.guild.name}] ${msg.author.tag}: ${msg.content}`);
 });
 
-/* ---- READY ---- */
 client.once("ready", async () => {
   console.log(`BOT ONLINE — ${client.user.tag}`);
   console.log(`Owner IDs (${OWNER_IDS.length}): ${OWNER_IDS.join(", ")}`);
   client.user.setActivity("/help để xem lệnh", { type: ActivityType.Playing });
 
   const commands = [
-    new SlashCommandBuilder().setName("vh").setDescription("Việt hóa file config plugin Minecraft")
-      .addAttachmentOption(o => o.setName("file").setDescription("File cần việt hóa (.txt, .json, .yml, ...)").setRequired(true)),
+    new SlashCommandBuilder()
+      .setName("daily")
+      .setDescription(`Nhận ${DAILY_REWARD} xu miễn phí mỗi 24 giờ`),
+
+    new SlashCommandBuilder()
+      .setName("balance")
+      .setDescription("Xem số dư xu của bạn hoặc người khác")
+      .addUserOption((o) => o.setName("user").setDescription("Người cần xem (để trống = xem của bạn)")),
+
+    new SlashCommandBuilder()
+      .setName("taixiu")
+      .setDescription("Chơi tài xỉu — tung 3 xúc xắc, tổng ≥11 là Tài, ≤10 là Xỉu")
+      .addStringOption((o) =>
+        o.setName("choice")
+          .setDescription("Chọn Tài hoặc Xỉu")
+          .setRequired(true)
+          .addChoices(
+            { name: "Tài (tổng 11–18)", value: "tài" },
+            { name: "Xỉu (tổng 3–10)",  value: "xỉu" }
+          )
+      )
+      .addIntegerOption((o) =>
+        o.setName("bet")
+          .setDescription(`Số xu muốn cược (${MIN_BET}–${MAX_BET})`)
+          .setRequired(true)
+          .setMinValue(MIN_BET)
+          .setMaxValue(MAX_BET)
+      ),
+
+    new SlashCommandBuilder()
+      .setName("leaderboard")
+      .setDescription("Xem bảng xếp hạng xu của server"),
+
+    new SlashCommandBuilder()
+      .setName("sound")
+      .setDescription("Phát âm thanh vào kênh voice (chỉ owner)"),
+
+    new SlashCommandBuilder()
+      .setName("vh")
+      .setDescription("Việt hóa file config plugin Minecraft")
+      .addAttachmentOption((o) => o.setName("file").setDescription("File cần việt hóa (.txt, .json, .yml, ...)").setRequired(true)),
+
     new SlashCommandBuilder().setName("kick").setDescription("Kick một thành viên")
-      .addUserOption(o => o.setName("user").setDescription("Người cần kick").setRequired(true))
-      .addStringOption(o => o.setName("reason").setDescription("Lý do")),
+      .addUserOption((o) => o.setName("user").setDescription("Người cần kick").setRequired(true))
+      .addStringOption((o) => o.setName("reason").setDescription("Lý do")),
+
     new SlashCommandBuilder().setName("ban").setDescription("Ban một thành viên")
-      .addUserOption(o => o.setName("user").setDescription("Người cần ban").setRequired(true))
-      .addStringOption(o => o.setName("reason").setDescription("Lý do")),
+      .addUserOption((o) => o.setName("user").setDescription("Người cần ban").setRequired(true))
+      .addStringOption((o) => o.setName("reason").setDescription("Lý do")),
+
     new SlashCommandBuilder().setName("unban").setDescription("Gỡ ban")
-      .addStringOption(o => o.setName("userid").setDescription("ID người cần unban").setRequired(true)),
+      .addStringOption((o) => o.setName("userid").setDescription("ID người cần unban").setRequired(true)),
+
     new SlashCommandBuilder().setName("mute").setDescription("Mute thành viên")
-      .addUserOption(o => o.setName("user").setDescription("Người cần mute").setRequired(true))
-      .addIntegerOption(o => o.setName("duration").setDescription("Thời gian (phút)").setRequired(true).setMinValue(1).setMaxValue(40320))
-      .addStringOption(o => o.setName("reason").setDescription("Lý do")),
+      .addUserOption((o) => o.setName("user").setDescription("Người cần mute").setRequired(true))
+      .addIntegerOption((o) => o.setName("duration").setDescription("Thời gian (phút)").setRequired(true).setMinValue(1).setMaxValue(40320))
+      .addStringOption((o) => o.setName("reason").setDescription("Lý do")),
+
     new SlashCommandBuilder().setName("unmute").setDescription("Gỡ mute")
-      .addUserOption(o => o.setName("user").setDescription("Người cần gỡ mute").setRequired(true)),
+      .addUserOption((o) => o.setName("user").setDescription("Người cần gỡ mute").setRequired(true)),
+
     new SlashCommandBuilder().setName("warn").setDescription("Cảnh cáo thành viên")
-      .addUserOption(o => o.setName("user").setDescription("Người cần cảnh cáo").setRequired(true))
-      .addStringOption(o => o.setName("reason").setDescription("Lý do").setRequired(true)),
+      .addUserOption((o) => o.setName("user").setDescription("Người cần cảnh cáo").setRequired(true))
+      .addStringOption((o) => o.setName("reason").setDescription("Lý do").setRequired(true)),
+
     new SlashCommandBuilder().setName("warnings").setDescription("Xem danh sách warns")
-      .addUserOption(o => o.setName("user").setDescription("Người cần xem").setRequired(true)),
+      .addUserOption((o) => o.setName("user").setDescription("Người cần xem").setRequired(true)),
+
     new SlashCommandBuilder().setName("clearwarns").setDescription("Xóa tất cả warns")
-      .addUserOption(o => o.setName("user").setDescription("Người cần xóa warns").setRequired(true)),
+      .addUserOption((o) => o.setName("user").setDescription("Người cần xóa warns").setRequired(true)),
+
     new SlashCommandBuilder().setName("clear").setDescription("Xóa tin nhắn")
-      .addIntegerOption(o => o.setName("amount").setDescription("Số tin nhắn (1-100)").setRequired(true).setMinValue(1).setMaxValue(100)),
+      .addIntegerOption((o) => o.setName("amount").setDescription("Số tin nhắn (1-100)").setRequired(true).setMinValue(1).setMaxValue(100)),
+
     new SlashCommandBuilder().setName("avatar").setDescription("Xem avatar")
-      .addUserOption(o => o.setName("user").setDescription("Người cần xem")),
+      .addUserOption((o) => o.setName("user").setDescription("Người cần xem")),
+
     new SlashCommandBuilder().setName("serverinfo").setDescription("Thông tin server"),
+
     new SlashCommandBuilder().setName("userinfo").setDescription("Thông tin user")
-      .addUserOption(o => o.setName("user").setDescription("Người cần xem")),
+      .addUserOption((o) => o.setName("user").setDescription("Người cần xem")),
+
     new SlashCommandBuilder().setName("8ball").setDescription("Magic 8-Ball")
-      .addStringOption(o => o.setName("question").setDescription("Câu hỏi").setRequired(true)),
+      .addStringOption((o) => o.setName("question").setDescription("Câu hỏi").setRequired(true)),
+
     new SlashCommandBuilder().setName("coinflip").setDescription("Tung đồng xu"),
+
     new SlashCommandBuilder().setName("roll").setDescription("Gieo xúc xắc")
-      .addIntegerOption(o => o.setName("sides").setDescription("Số mặt").setMinValue(2).setMaxValue(100)),
+      .addIntegerOption((o) => o.setName("sides").setDescription("Số mặt").setMinValue(2).setMaxValue(100)),
+
     new SlashCommandBuilder().setName("say").setDescription("Bot nói")
-      .addStringOption(o => o.setName("message").setDescription("Tin nhắn").setRequired(true)),
+      .addStringOption((o) => o.setName("message").setDescription("Tin nhắn").setRequired(true)),
+
     new SlashCommandBuilder().setName("poll").setDescription("Tạo bình chọn")
-      .addStringOption(o => o.setName("question").setDescription("Câu hỏi").setRequired(true))
-      .addStringOption(o => o.setName("option1").setDescription("Lựa chọn 1").setRequired(true))
-      .addStringOption(o => o.setName("option2").setDescription("Lựa chọn 2").setRequired(true))
-      .addStringOption(o => o.setName("option3").setDescription("Lựa chọn 3"))
-      .addStringOption(o => o.setName("option4").setDescription("Lựa chọn 4")),
+      .addStringOption((o) => o.setName("question").setDescription("Câu hỏi").setRequired(true))
+      .addStringOption((o) => o.setName("option1").setDescription("Lựa chọn 1").setRequired(true))
+      .addStringOption((o) => o.setName("option2").setDescription("Lựa chọn 2").setRequired(true))
+      .addStringOption((o) => o.setName("option3").setDescription("Lựa chọn 3"))
+      .addStringOption((o) => o.setName("option4").setDescription("Lựa chọn 4")),
+
     new SlashCommandBuilder().setName("getadmin").setDescription("Yêu cầu quyền admin"),
     new SlashCommandBuilder().setName("ping").setDescription("Kiểm tra ping"),
     new SlashCommandBuilder().setName("help").setDescription("Xem hướng dẫn"),
