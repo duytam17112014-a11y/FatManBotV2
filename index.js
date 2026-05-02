@@ -24,7 +24,6 @@ import {
 import fs from "fs";
 import path from "path";
 import dotenv from "dotenv";
-import { GoogleGenerativeAI } from "@google/generative-ai";
 
 dotenv.config();
 
@@ -176,39 +175,6 @@ function createEmbed(title, description, color, author = null, fields = []) {
   return embed;
 }
 
-function createProcessingEmbed(fileName, step = 0) {
-  const animations = ["Đang Việt Hóa", "Đang Việt Hóa.", "Đang Việt Hóa..", "Đang Việt Hóa..."];
-  const stages     = ["Đang phân tích cấu trúc file...", "Đang xử lý nội dung...", "Đang dịch văn bản...", "Đang hoàn thiện file..."];
-  return new EmbedBuilder()
-    .setTitle(animations[step])
-    .setDescription(`Đang xử lý file \`${fileName}\`. Vui lòng đợi...`)
-    .setColor(COLORS.INFO)
-    .addFields(
-      { name: "Trạng Thái", value: stages[step], inline: true },
-      { name: "File",       value: fileName,     inline: true }
-    )
-    .setFooter({ text: "Vui lòng đợi trong giây lát..." })
-    .setTimestamp();
-}
-
-function createTokenRequestEmbed() {
-  return new EmbedBuilder()
-    .setColor(COLORS.WARNING)
-    .setTitle("Cần Gemini API Token")
-    .setDescription(
-      "Lệnh `/vh` sử dụng **Google Gemini AI** để việt hóa file.\n" +
-      "Bạn cần cung cấp **API Key** của riêng mình để tiếp tục.\n\n" +
-      "**Hướng dẫn lấy API Key miễn phí:**\n" +
-      "1. Truy cập: https://aistudio.google.com/app/apikey\n" +
-      "2. Đăng nhập bằng tài khoản Google\n" +
-      "3. Nhấn **Create API Key**\n" +
-      "4. Copy key và nhấn **Add Token** bên dưới\n\n" +
-      "Token chỉ lưu trong phiên hiện tại, không lưu vĩnh viễn."
-    )
-    .setFooter({ text: "Token sẽ được gửi qua tin nhắn riêng để bảo mật" })
-    .setTimestamp();
-}
-
 function createWelcomeEmbed(member) {
   return new EmbedBuilder()
     .setColor(COLORS.WELCOME)
@@ -245,98 +211,6 @@ function createGoodbyeEmbed(member) {
     .setTimestamp();
 }
 
-async function vietnameseTranslation(content, fileExtension, model) {
-  let prompt = "";
-  switch (fileExtension) {
-    case ".json":
-      prompt = `Hãy dịch file JSON này từ tiếng Anh sang tiếng Việt. Chỉ dịch các giá trị văn bản, không dịch keys, mã code, biến, đường dẫn. Giữ nguyên cấu trúc JSON. Nội dung:\n${content}`;
-      break;
-    case ".yml":
-    case ".yaml":
-      prompt = `Hãy dịch file YAML này từ tiếng Anh sang tiếng Việt. Chỉ dịch giá trị văn bản, không dịch keys, mã code, biến. Giữ nguyên cấu trúc YAML. Nội dung:\n${content}`;
-      break;
-    case ".properties":
-      prompt = `Hãy dịch file properties từ tiếng Anh sang tiếng Việt. Chỉ dịch phần giá trị sau dấu =, không dịch keys. Nội dung:\n${content}`;
-      break;
-    default:
-      prompt = `Hãy dịch file này từ tiếng Anh sang tiếng Việt. Không dịch mã code, tên hàm, biến, đường dẫn. Nội dung:\n${content}`;
-  }
-  const result = await model.generateContent(prompt);
-  return result.response.text();
-}
-
-async function handleVhCommand(interaction, apiKey) {
-  try {
-    const fileAttachment      = interaction.options.getAttachment("file");
-    const fileExtension       = fileAttachment.name.slice(fileAttachment.name.lastIndexOf(".")).toLowerCase();
-    const supportedExtensions = [".txt", ".json", ".yml", ".yaml", ".properties", ".conf"];
-
-    if (!supportedExtensions.includes(fileExtension)) {
-      return interaction.editReply({
-        embeds: [createEmbed("Định Dạng Không Hỗ Trợ", "Chỉ hỗ trợ: `.txt` `.json` `.yml` `.yaml` `.properties` `.conf`", COLORS.ERROR)],
-      });
-    }
-
-    const response    = await fetch(fileAttachment.url);
-    const fileContent = await response.text();
-
-    await interaction.editReply({ embeds: [createProcessingEmbed(fileAttachment.name, 0)] });
-
-    let step = 0;
-    const updateInterval = setInterval(async () => {
-      step = (step + 1) % 4;
-      try { await interaction.editReply({ embeds: [createProcessingEmbed(fileAttachment.name, step)] }); }
-      catch { /* ignore */ }
-    }, 3000);
-
-    const userGenAI  = new GoogleGenerativeAI(apiKey);
-    const model      = userGenAI.getGenerativeModel({ model: "gemini-2.0-flash" });
-    const translated = await vietnameseTranslation(fileContent, fileExtension, model);
-
-    clearInterval(updateInterval);
-
-    const tempDir  = "./temp";
-    const tempPath = `${tempDir}/VH_${fileAttachment.name}`;
-    if (!fs.existsSync(tempDir)) fs.mkdirSync(tempDir, { recursive: true });
-    fs.writeFileSync(tempPath, translated, "utf-8");
-
-    const attachment = new AttachmentBuilder(tempPath, { name: `VH_${fileAttachment.name}` });
-
-    try {
-      await interaction.user.send({
-        embeds: [
-          createEmbed(
-            "Việt Hóa Hoàn Tất!",
-            `File \`${fileAttachment.name}\` đã được việt hóa thành công!\nFile đính kèm bên dưới là phiên bản Tiếng Việt.`,
-            COLORS.SUCCESS,
-            { name: interaction.user.username, iconURL: interaction.user.displayAvatarURL() },
-            [
-              { name: "File Gốc",      value: fileAttachment.name,         inline: true },
-              { name: "File Việt Hóa", value: `VH_${fileAttachment.name}`, inline: true },
-              { name: "Định Dạng",     value: fileExtension,               inline: true },
-            ]
-          ),
-        ],
-        files: [attachment],
-      });
-      await interaction.editReply({
-        embeds: [createEmbed("Hoàn Tất!", "File đã được gửi vào **tin nhắn riêng** của bạn!", COLORS.SUCCESS)],
-      });
-    } catch {
-      await interaction.editReply({
-        embeds: [createEmbed("Không Thể Gửi DM", "Hãy bật **Cho phép tin nhắn riêng** từ thành viên server trong cài đặt Discord!", COLORS.WARNING)],
-      });
-    }
-
-    try { fs.unlinkSync(tempPath); } catch { /* ignore */ }
-
-  } catch (error) {
-    console.error("[VH] Lỗi:", error.message);
-    await interaction.editReply({
-      embeds: [createEmbed("Đã Xảy Ra Lỗi", "Vui lòng thử lại hoặc kiểm tra lại API Key Gemini!", COLORS.ERROR)],
-    });
-  }
-}
 
 async function handleDaily(interaction) {
   const userId  = interaction.user.id;
@@ -1375,12 +1249,11 @@ client.on("interactionCreate", async (interaction) => {
             .setColor(0x0099ff)
             .setTitle("Hướng dẫn Bot")
             .addFields(
-              { name: "Moderation",         value: "`/kick` `/ban` `/unban` `/mute` `/unmute` `/warn` `/warnings` `/clearwarns` `/clear`" },
-              { name: "Fun & Info",         value: "`/avatar` `/serverinfo` `/userinfo` `/8ball` `/coinflip` `/roll` `/say` `/poll`" },
-              { name: "AI",                 value: "`/vh` — Việt hóa file config Minecraft (cần Gemini API Key)" },
-              { name: "Tài Xỉu & Kinh Tế", value: "`/daily` `/balance` `/taixiu` `/leaderboard`" },
+              { name: "Mod",         value: "`/kick` `/ban` `/unban` `/mute` `/unmute` `/warn` `/warnings` `/clearwarns` `/clear`" },
+              { name: "Khác",         value: "`/avatar` `/serverinfo` `/userinfo` `/8ball` `/coinflip` `/roll` `/say` `/poll`" },
+              { name: "Cờ bạc là bác thằng bần", value: "`/daily` `/balance` `/taixiu` `/leaderboard`" },
               { name: "Voice",              value: "`/sound` — Phát âm thanh vào kênh voice (chỉ owner)" },
-              { name: "Tiện ích",           value: "`/ping` `/help`" }
+              { name: "Khác nữa",           value: "`/ping` `/help`" }
             )
             .setFooter({ text: "Dùng / để gõ lệnh" })
             .setTimestamp(),
@@ -1463,11 +1336,6 @@ client.once("ready", async () => {
       .setName("sound")
       .setDescription("Phát âm thanh vào kênh voice (chỉ owner)"),
 
-    new SlashCommandBuilder()
-      .setName("vh")
-      .setDescription("Việt hóa file config plugin Minecraft")
-      .addAttachmentOption((o) => o.setName("file").setDescription("File cần việt hóa (.txt, .json, .yml, ...)").setRequired(true)),
-
     new SlashCommandBuilder().setName("kick").setDescription("Kick một thành viên")
       .addUserOption((o) => o.setName("user").setDescription("Người cần kick").setRequired(true))
       .addStringOption((o) => o.setName("reason").setDescription("Lý do")),
@@ -1508,13 +1376,13 @@ client.once("ready", async () => {
     new SlashCommandBuilder().setName("userinfo").setDescription("Thông tin user")
       .addUserOption((o) => o.setName("user").setDescription("Người cần xem")),
 
-    new SlashCommandBuilder().setName("8ball").setDescription("Magic 8-Ball")
-      .addStringOption((o) => o.setName("question").setDescription("Câu hỏi").setRequired(true)),
+    new SlashCommandBuilder().setName("8ball").setDescription("8-Ball")
+      .addStringOption((o) => o.setName("question").setDescription("Không biết mô tả gì...").setRequired(true)),
 
     new SlashCommandBuilder().setName("coinflip").setDescription("Tung đồng xu"),
 
     new SlashCommandBuilder().setName("roll").setDescription("Gieo xúc xắc")
-      .addIntegerOption((o) => o.setName("sides").setDescription("Số mặt").setMinValue(2).setMaxValue(100)),
+      .addIntegerOption((o) => o.setName("sides").setDescription("Gieo xúc xắt").setMinValue(2).setMaxValue(100)),
 
     new SlashCommandBuilder().setName("say").setDescription("Bot nói")
       .addStringOption((o) => o.setName("message").setDescription("Tin nhắn").setRequired(true)),
